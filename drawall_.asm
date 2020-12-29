@@ -1353,9 +1353,9 @@ standing2 DB 150, 24, 231, 17, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 
 startX DW  0030
-startY DW  0080
-start2X Dw 0200
-start2XX DW 0180
+startY DW  0200
+start2X Dw 0550
+start2XX DW 0550
 .CODE
 MAIN PROC FAR
  mov ax, @data
@@ -1363,7 +1363,7 @@ MAIN PROC FAR
 	       mov ax, 4F02h        	;
 	       mov bx, 0100h        	; 640x400 screen graphics mode
 	       INT 10h              	;execute the configuration
-	    
+
 		;draw both players
         beginning:
 		DrawImage standingW, standingH, standing, startX,startY
@@ -1371,6 +1371,12 @@ MAIN PROC FAR
 
 		mov ah,0
 		int 16h ;get character
+		
+		
+
+
+
+
 		cmp al,7Ah
 		je kick1
 		cmp al,78h
