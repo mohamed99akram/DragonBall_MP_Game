@@ -1,8 +1,11 @@
 DrawImage MACRO 
+	local Drawit
+	local Start
+	local Ending
 	MOV AH,0Bh   	;set the configuration
 	       MOV CX, imgW  	;set the width (X) up to 64 (based on image resolution)
 	       MOV DX, imgH 	;set the hieght (Y) up to 64 (based on image resolution)
-		   mov DI, offset img  ; to iterate over the pixels
+		   mov DI,  img  ; to iterate over the pixels
 	       jmp Start    	;Avoid drawing before the calculations
 	Drawit:
 			add CX,startpositionX
@@ -21,9 +24,14 @@ DrawImage MACRO
 	       DEC DX       	;  loop iteration in y direction
 	       JZ  ENDING   	;  both x and y reached 00 so end program
 		   Jmp Drawit
+	
+	ENDING:
 ENDM DrawImage
 
 ClearImage MACRO 
+	local Drawit
+	local Start
+	local Ending
 	MOV AH,0Bh   	;set the configuration
 	       MOV CX, imgW  	;set the width (X) up to 64 (based on image resolution)
 	       MOV DX, imgH 	;set the hieght (Y) up to 64 (based on image resolution)
@@ -44,4 +52,6 @@ ClearImage MACRO
 	       DEC DX       	;  loop iteration in y direction
 	       JZ  ENDING   	;  both x and y reached 00 so end program
 		   Jmp Drawit
+	
+	ENDING:
 ENDM DrawImage
