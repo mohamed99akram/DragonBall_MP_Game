@@ -1,6 +1,6 @@
 include drawing.inc
 .model huge
-.Stack 128
+.Stack 64
 .data
 
 backW equ 47
@@ -1372,37 +1372,22 @@ MAIN PROC FAR
 		mov ah,0
 		int 16h ;get character
 		cmp al,7Ah
-		jne lbl1
-		jmp kick1
-		lbl1:
+		je kick1
 		cmp al,78h
-		jne lbl2
-		jmp box1
-		lbl2:
+		je box1
 		cmp al,63h
-		jne lbl3
-		jmp fireee1
-		lbl3:
+		je fireee1
 		cmp al,76h
-		jne lbl4
-		jmp barrry1
-		lbl4:
+		je barrry1
 		cmp al,69h
-		jne lbl5
-		jmp kick2
-		lbl5:
+		je kick2
 		cmp al,6fh
-		jne lbl6
-		jmp box2
-		lbl6:
+		je box2
 		cmp al,70h
-		jne lbl7
-		jmp fireee2
-		lbl7:
+		je fireee2
 		cmp al,6Ch
-		jne lbl8
-		jmp barrry2
-		lbl8:
+		je barrry2
+
 		jmp beginning
 		
 		box1:
@@ -1464,7 +1449,7 @@ MAIN PROC FAR
 	MAIN ENDP
 
 
-delay    PROC   FAR
+delay    PROC    
        MOV     CX, 0003H
         MOV     DX, 0D40H
         MOV     AH, 86H
