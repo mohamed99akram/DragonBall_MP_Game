@@ -1384,9 +1384,8 @@ MAIN PROC FAR
         DRAW_IMG_AT standing,50,GROUND_Y 
         DRAW_IMG_AT standing2,550,GROUND_Y
 
-        L1:
-        MOV CX,2
-        LOOP L1
+        L1: jmp l1
+
 	MAIN ENDP
 
 DRAW_IMG PROC
@@ -1441,11 +1440,12 @@ CLEAR_IMG PROC
         Jmp Drawitt
 	ENDCLEARING:
 CLEAR_IMG ENDP
+
 delay    PROC    
-       MOV     CX, 0003H
+        MOV     CX, 0003H
         MOV     DX, 0D40H
         MOV     AH, 86H
         INT     15H 
-         RET
+        RET
 delay    ENDP    
 END MAIN
