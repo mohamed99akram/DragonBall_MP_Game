@@ -1390,13 +1390,18 @@ P1_PREV_IMG_OFST DW ?;PREVIOUS
 P2_PREV_IMG_OFST DW ?
 
 GROUND_Y DW 200
+;########FUNCTIONS EASIER######
+RETURN_VALUE_W DW ?
+RETURN_VALUE_B DB ?
 
-;########TASK MEMORY HANDLING######
+;########TASKS MEMORY HANDLING######
 
 ;LEFT PRESS TASK 
 P2_LEFT_TASK_BOOL DB 0   ;0 If doesn't have to go left, 1 else
 P2_LEFT_TASK_VALUE DB 0  ;VALUE TO GO LEFT
 
+P2_RIGHT_TASK_BOOL DB 0
+P2_RIGHT_TASK_VALUE DB 0
 
 TEMPW DW ?
 
@@ -1437,17 +1442,26 @@ INFINITE_LOOP:
         P2_LA_CHECK:
         CMP AH,P2_LEFT_ARROW ; LEFT ARROW PRESSED?
         JNZ P2_RA_CHECK
-                CMP P2_LEFT_TASK_BOOL,1
-                JZ P2_RA_CHECK
+                ; CMP P2_LEFT_TASK_BOOL,1
+                ; JZ P2_RA_CHECK
                 ;HERE LEFT ARROW IS PRESSED
                 MOV P2_LEFT_TASK_BOOL,1   ;ACTIVATE TASK
-                MOV P2_LEFT_TASK_VALUE,5 ;VALUE=5, ARBITRARY ACUTALLY
-                MOV AX,P2_CUR_IMG_OFST
-                MOV P2_PREV_IMG_OFST,AX
+                ADD P2_LEFT_TASK_VALUE,5 ;VALUE=5, ARBITRARY ACUTALLY, ADD FOR MANY PRESSES
+                MOV_MEM P2_PREV_IMG_OFST,P2_CUR_IMG_OFST
+                MOV P2_RIGHT_TASK_BOOL,0        ;STOP HIM IF HE WAS GOING RIGHT
+                MOV P2_RIGHT_TASK_VALUE,0
                 JMP END_OF_INPUT
        
         P2_RA_CHECK:
-
+        CMP AH,P2_RIGHT_ARROW
+        JNZ P2_UP_CHECK
+                MOV P2_RIGHT_TASK_BOOL,1
+                ADD P2_RIGHT_TASK_VALUE,5
+                MOV_MEM P2_PREV_IMG_OFST,P2_CUR_IMG_OFST
+                MOV P2_LEFT_TASK_BOOL,0        ;STOP HIM IF HE WAS GOING LEFT
+                MOV P2_LEFT_TASK_VALUE,0
+                JMP END_OF_INPUT
+        P2_UP_CHECK:
         END_OF_INPUT:
         CALL CONTINUE_TASKS
 JMP INFINITE_LOOP
@@ -1460,37 +1474,63 @@ P2_LA_TASK_CHECK: ;~~~~~~~~~~~LEFT_P2~~~~~~~~~~
     CMP P2_LEFT_TASK_BOOL,1 ; LEFT ARROW P2 ACTIVATED?
     JNZ P2_RA_TASK_CHECK
     CMP P2_LEFT_TASK_VALUE,0
-    JLE STOP_P2
+    JLE STOP_P2_LEFT
         HIT_P1:;?
         ; COMPARE TWO PLAYERS POSITIONS NOT TO HIT EACH OTHER
-        MOV BX, P2_CUR_IMG_OFST
+        MOV BX, P1_CUR_IMG_OFST
         SUB BX,4 
         MOV AX,P1_CUR_X
-        ADD AX,[BX]
+        ADD AX,[BX]             ;NOW AX HAS RIGHT END OF P1
         MOV BX,P2_CUR_X 
-        SUB BX,1
+        SUB BX,1                ;FUTURE POSITION
         CMP AX,BX 
-        JGE STOP_P2
+        JGE STOP_P2_LEFT
         ;CLEAR,DRAW----> P2_CUR_IMG_OFST: OFFSET & P2_CUR_X: NEW POS ---- clear,change,update,draw,updateTask
+        ;THIS PART SHOULD BE CONVERTED INTO A MACRO
         CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
         SUB P2_CUR_X,5                                  ;(STEP) - MAY CHANGE
-        ; MOV AX, OFFSET moving2                          
-        ; MOV P2_CUR_IMG_OFST,AX                          ;JUST SOME UPDATES
         MOV_MEM P2_CUR_IMG_OFST,OFFSET moving2
         DRAW_IMG_AT moving2,P2_CUR_X,P2_CUR_Y
         DEC P2_LEFT_TASK_VALUE
         JMP P2_RA_TASK_CHECK
         ;RETURN TO PREVIOUS STATE
-        STOP_P2:
+        STOP_P2_LEFT:
         CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
-        MOV AX, OFFSET standing2
-        MOV P2_CUR_IMG_OFST,AX
+        MOV_MEM P2_CUR_IMG_OFST,OFFSET standing2
         DRAW_IMG_AT standing2,P2_CUR_X,P2_CUR_Y
         MOV P2_LEFT_TASK_BOOL,0
         MOV P2_LEFT_TASK_VALUE,0
         
 P2_RA_TASK_CHECK:
-
+    CMP P2_RIGHT_TASK_BOOL,1
+    JNZ P2_UP_TASK_CHECK
+    CMP P2_RIGHT_TASK_VALUE,0
+    JLE STOP_P2_RIGHT
+        HIT_SREEN_P2:;?
+        ;COMPARE PLAYER'S END WITH SCREEN
+        MOV BX,P2_CUR_IMG_OFST 
+        SUB BX,4                ;GET WIDTH
+        MOV AX,P2_CUR_X
+        ADD AX,[BX]             ;RIGHT END OF THE PLAYER
+        ADD AX,1
+        CMP AX,620
+        JGE STOP_P2_RIGHT
+        ;CLEAR,DRAW----> P2_CUR_IMG_OFST: OFFSET & P2_CUR_X: NEW POS ---- clear,change,update,draw,updateTask
+        ;THIS PART SHOULD BE CONVERTED INTO A MACRO
+        CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
+        ADD P2_CUR_X,5                                  ;(STEP) - MAY CHANGE
+        MOV_MEM P2_CUR_IMG_OFST,OFFSET back2
+        DRAW_IMG_AT back2,P2_CUR_X,P2_CUR_Y
+        DEC P2_LEFT_TASK_VALUE
+        JMP P2_UP_TASK_CHECK
+        ;RETURN TO PREVIOUS STATE
+        STOP_P2_RIGHT:
+        CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
+        MOV_MEM P2_CUR_IMG_OFST,OFFSET standing2
+        DRAW_IMG_AT standing2,P2_CUR_X,P2_CUR_Y
+        MOV P2_RIGHT_TASK_BOOL,0
+        MOV P2_RIGHT_TASK_VALUE,0
+P2_UP_TASK_CHECK:
     SMALLEST_DELAY:; MAYBE NO NEED FOR IT
     ;CALL SMALL_DELAY
     RET
