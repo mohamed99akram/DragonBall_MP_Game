@@ -1455,6 +1455,8 @@ INFINITE_LOOP:
         P2_RA_CHECK:
         CMP AH,P2_RIGHT_ARROW
         JNZ P2_UP_CHECK
+                ; CMP P2_RIGHT_TASK_BOOL,1
+                ; JZ P2_UP_CHECK
                 MOV P2_RIGHT_TASK_BOOL,1
                 ADD P2_RIGHT_TASK_VALUE,5
                 MOV_MEM P2_PREV_IMG_OFST,P2_CUR_IMG_OFST
@@ -1501,7 +1503,7 @@ P2_LA_TASK_CHECK: ;~~~~~~~~~~~LEFT_P2~~~~~~~~~~
         MOV P2_LEFT_TASK_BOOL,0
         MOV P2_LEFT_TASK_VALUE,0
         
-P2_RA_TASK_CHECK:
+P2_RA_TASK_CHECK:;~~~~~~~~~~~RIGHT_P2~~~~~~~~~~
     CMP P2_RIGHT_TASK_BOOL,1
     JNZ P2_UP_TASK_CHECK
     CMP P2_RIGHT_TASK_VALUE,0
@@ -1521,7 +1523,7 @@ P2_RA_TASK_CHECK:
         ADD P2_CUR_X,5                                  ;(STEP) - MAY CHANGE
         MOV_MEM P2_CUR_IMG_OFST,OFFSET back2
         DRAW_IMG_AT back2,P2_CUR_X,P2_CUR_Y
-        DEC P2_LEFT_TASK_VALUE
+        DEC P2_RIGHT_TASK_VALUE
         JMP P2_UP_TASK_CHECK
         ;RETURN TO PREVIOUS STATE
         STOP_P2_RIGHT:
