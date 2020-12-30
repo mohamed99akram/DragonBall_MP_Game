@@ -1386,12 +1386,12 @@ IMG_TO_DRAW_OFST DW ?
 IMG_X DW ?
 IMG_Y DW ?
 
-P1_PREV_IMG_OFST DW ?
+P1_PREV_IMG_OFST DW ?;PREVIOUS
 P2_PREV_IMG_OFST DW ?
 
 GROUND_Y DW 200
 
-;########TASK HANDLING######
+;########TASK MEMORY HANDLING######
 
 ;LEFT PRESS TASK 
 P2_LEFT_TASK_BOOL DB 0   ;0 If doesn't have to go left, 1 else
@@ -1400,7 +1400,7 @@ P2_LEFT_TASK_VALUE DB 0  ;VALUE TO GO LEFT
 
 TEMPW DW ?
 
-
+;Any changes to positioin should update players positions and their current picture
 .CODE
 MAIN PROC FAR
  mov ax, @data
@@ -1409,7 +1409,7 @@ MAIN PROC FAR
 	       mov bx, 0100h        	; 640x400 screen graphics mode
 	       INT 10h              	;execute the configuration
 	    
-        ;initial position
+        ;INITIALIZATIONS
         DRAW_IMG_AT standing,50,GROUND_Y     ;Player1 on the ground TODO: GROUND IS WRONG
         MOV P1_CUR_X,50
         MOV AX,GROUND_Y
@@ -1421,10 +1421,10 @@ MAIN PROC FAR
         MOV P2_CUR_X,550
         MOV AX,GROUND_Y
         MOV P2_CUR_Y,AX
-        MOV AX,IMG_TO_DRAW_OFST              ;Player1's img variable update
+        MOV AX,IMG_TO_DRAW_OFST              ;Player2's img variable update
         MOV P2_CUR_IMG_OFST,AX          
         
-        INFINITE_LOOP:
+INFINITE_LOOP:
         ;get character
 
         MOV AH,01H
@@ -1436,43 +1436,51 @@ MAIN PROC FAR
 
         P2_LA_CHECK:
         CMP AH,P2_LEFT_ARROW ; LEFT ARROW PRESSED?
-        
         JNZ P2_RA_CHECK
-            ;HERE LEFT ARROW IS PRESSED
-            MOV P2_LEFT_TASK_BOOL,1   ;ACTIVATE TASK
-            MOV P2_LEFT_TASK_VALUE,20 ;MOVE 20PX
-            JMP END_OF_INPUT
+                CMP P2_LEFT_TASK_BOOL,1
+                JZ P2_RA_CHECK
+                ;HERE LEFT ARROW IS PRESSED
+                MOV P2_LEFT_TASK_BOOL,1   ;ACTIVATE TASK
+                MOV P2_LEFT_TASK_VALUE,5 ;VALUE=5, ARBITRARY ACUTALLY
+                MOV AX,P2_CUR_IMG_OFST
+                MOV P2_PREV_IMG_OFST,AX
+                JMP END_OF_INPUT
+       
         P2_RA_CHECK:
-        
+
         END_OF_INPUT:
         CALL CONTINUE_TASKS
-        JMP INFINITE_LOOP
+JMP INFINITE_LOOP
         
 MAIN ENDP
-
+;###########################CONTINUE TASKS#######################
 CONTINUE_TASKS PROC
-	P2_LA_TASK_CHECK:
+
+P2_LA_TASK_CHECK: ;~~~~~~~~~~~LEFT_P2~~~~~~~~~~
     CMP P2_LEFT_TASK_BOOL,1 ; LEFT ARROW P2 ACTIVATED?
     JNZ P2_RA_TASK_CHECK
     CMP P2_LEFT_TASK_VALUE,0
-    JZ STOP_P2
-        ; HIT_P1:;?
-
-        ; MOV BX, P2_CUR_IMG_OFST
-        ; SUB BX,4 ; NOW HAS THE WIDTH OFFSET OF P1
-        ; MOV AX,P1_CUR_X
-        ; ADD AX,[BX];NOW HAS PLAYER2 END
-        ; MOV BX,P2_CUR_X ; WILL SUBTRACT 1 FROM IT TO CHECK (MOVE 1PX TO THE LEFT)
-        ; SUB BX,1
-        ; CMP AX,BX ; P1,P2 WILL HIT?
-        ; JGE STOP_P2
-        
+    JLE STOP_P2
+        HIT_P1:;?
+        ; COMPARE TWO PLAYERS POSITIONS NOT TO HIT EACH OTHER
+        MOV BX, P2_CUR_IMG_OFST
+        SUB BX,4 
+        MOV AX,P1_CUR_X
+        ADD AX,[BX]
+        MOV BX,P2_CUR_X 
+        SUB BX,1
+        CMP AX,BX 
+        JGE STOP_P2
+        ;CLEAR,DRAW----> P2_CUR_IMG_OFST: OFFSET & P2_CUR_X: NEW POS ---- clear,change,update,draw,updateTask
         CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
-        DEC P2_CUR_X
-        MOV AX, OFFSET moving2
-        MOV P2_CUR_IMG_OFST,AX
-        DRAW_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
-        
+        SUB P2_CUR_X,5                                  ;(STEP) - MAY CHANGE
+        ; MOV AX, OFFSET moving2                          
+        ; MOV P2_CUR_IMG_OFST,AX                          ;JUST SOME UPDATES
+        MOV_MEM P2_CUR_IMG_OFST,OFFSET moving2
+        DRAW_IMG_AT moving2,P2_CUR_X,P2_CUR_Y
+        DEC P2_LEFT_TASK_VALUE
+        JMP P2_RA_TASK_CHECK
+        ;RETURN TO PREVIOUS STATE
         STOP_P2:
         CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
         MOV AX, OFFSET standing2
@@ -1481,10 +1489,10 @@ CONTINUE_TASKS PROC
         MOV P2_LEFT_TASK_BOOL,0
         MOV P2_LEFT_TASK_VALUE,0
         
-    P2_RA_TASK_CHECK:
+P2_RA_TASK_CHECK:
 
-    SMALLEST_DELAY:
-    CALL SMALL_DELAY
+    SMALLEST_DELAY:; MAYBE NO NEED FOR IT
+    ;CALL SMALL_DELAY
     RET
 CONTINUE_TASKS ENDP
 
@@ -1541,7 +1549,7 @@ CLEAR_IMG PROC
 	ENDCLEARING:
 CLEAR_IMG ENDP
 SMALL_DELAY    PROC    
-        MOV     CX, 0003H
+        MOV     CX, 0000H
         MOV     DX, 0D40H
         MOV     AH, 86H
         INT     15H 
