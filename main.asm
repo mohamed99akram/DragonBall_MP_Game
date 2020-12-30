@@ -1351,7 +1351,28 @@ standing2 DB 150, 24, 231, 17, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
  DB 90, 90, 88, 12, 136, 160, 162, 65, 89, 88, 88, 89, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 89, 162 
  DB 162, 63, 63, 90, 89, 0, 88, 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
+;INPUT KEYS
+;PLAYER2
+;Scan Code
+P2_LEFT_ARROW DB 4BH
+P2_RIGHT_ARROW DB 4DH
+P2_UP_ARROW DB 48H
+;ASCII
+P2_BOX DB 'p'
+P2_KICK DB 'o'
+P2_FIRE DB 'i'
+P2_POWER_UP DB 'u'
 
+;PLAYER1
+P2_LEFT_ARROW DB 'a'
+P2_RIGHT_ARROW DB 'd'
+P2_UP_ARROW DB 'w'
+;ASCII
+P2_BOX DB 'c'
+P2_KICK DB 'v'
+P2_FIRE DB 'b'
+P2_POWER_UP DB 'n'
+;IMAGE HANDLING
 P1_CUR_IMG_OFST DW ?
 P1_CUR_X DB ?
 P1_CUR_Y DB ?
@@ -1364,14 +1385,13 @@ IMG_TO_DRAW_OFST DW ?
 IMG_X DW ?
 IMG_Y DW ?
 
+P1_PREV_IMG_OFST DW ?
+P2_PREV_IMG_OFST DW ?
+
 TEMPW DW ?
 
 GROUND_Y DW 200
 
-startX DW  0030
-startY DW  0200
-start2X Dw 0500
-start2XX DW 0500
 .CODE
 MAIN PROC FAR
  mov ax, @data
@@ -1381,11 +1401,22 @@ MAIN PROC FAR
 	       INT 10h              	;execute the configuration
 	    
         ;initial position
-        DRAW_IMG_AT standing,50,GROUND_Y 
-        DRAW_IMG_AT standing2,550,GROUND_Y
+        DRAW_IMG_AT standing,50,GROUND_Y     ;Player1 on the ground
+        MOV AX,IMG_TO_DRAW_OFST              ;Player1's img variable update
+        MOV P1_CUR_IMG_OFST,AX               
+        DRAW_IMG_AT standing2,550,GROUND_Y   ;Player2 on the ground
+        MOV AX,IMG_TO_DRAW_OFST              ;Player1's img variable update
+        MOV P2_CUR_IMG_OFST,AX          
+        
+        INFINITE_LOOP:
+        ;get character
+        mov ah,0
+		int 16h 
+        
 
-        L1: jmp l1
 
+        JMP INFINITE_LOOP
+        
 	MAIN ENDP
 
 DRAW_IMG PROC
