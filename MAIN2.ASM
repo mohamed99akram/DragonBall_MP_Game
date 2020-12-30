@@ -1475,8 +1475,6 @@ INFINITE_LOOP:
         JNZ P2_BARRIER_CHECK
                 CMP P2_UP_TASK_BOOL,1
                 JZ P2_BARRIER_CHECK
-                CMP P2_JUMPED_ALREADY_TASK_BOOL,1
-                JZ P2_BARRIER_CHECK
                 MOV P2_UP_TASK_BOOL,1
                 ADD P2_UP_TASK_VALUE,5
                 MOV_MEM P2_PREV_IMG_OFST,P2_CUR_IMG_OFST
@@ -1508,10 +1506,12 @@ P2_LA_TASK_CHECK: ;~~~~~~~~~~~LEFT_P2~~~~~~~~~~
         JGE STOP_P2_LEFT
         ;CLEAR,DRAW----> P2_CUR_IMG_OFST: OFFSET & P2_CUR_X: NEW POS ---- clear,change,update,draw,updateTask
         ;THIS PART SHOULD BE CONVERTED INTO A MACRO
-        CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
-        SUB P2_CUR_X,7                             ;(STEP) - MAY CHANGE
+        ; CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
+        MOV BX,P2_CUR_IMG_OFST
+        ClearImage moving2W,moving2H,[BX],P2_CUR_X,P2_CUR_Y
+        SUB P2_CUR_X,5                            ;(STEP) - MAY CHANGE
         MOV_MEM P2_CUR_IMG_OFST,OFFSET moving2
-        DRAW_IMG_AT moving2,P2_CUR_X,P2_CUR_Y
+        DrawImage moving2W,moving2H,moving2,P2_CUR_X,P2_CUR_Y
         DEC P2_LEFT_TASK_VALUE
         JMP P2_RA_TASK_CHECK
         ;RETURN TO PREVIOUS STATE
@@ -1539,7 +1539,7 @@ P2_RA_TASK_CHECK:;~~~~~~~~~~~RIGHT_P2~~~~~~~~~~
         ;CLEAR,DRAW----> P2_CUR_IMG_OFST: OFFSET & P2_CUR_X: NEW POS ---- clear,change,update,draw,updateTask
         ;THIS PART SHOULD BE CONVERTED INTO A MACRO
         CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
-        ADD P2_CUR_X,7                                  ;(STEP) - MAY CHANGE
+        ADD P2_CUR_X,5                                  ;(STEP) - MAY CHANGE
         MOV_MEM P2_CUR_IMG_OFST,OFFSET back2
         DRAW_IMG_AT back2,P2_CUR_X,P2_CUR_Y
         DEC P2_RIGHT_TASK_VALUE
@@ -1557,7 +1557,7 @@ P2_UP_TASK_CHECK:;~~~~~~~~~~~UP_P2~~~~~~~~~~
     CMP P2_UP_TASK_VALUE,0
     JLE STOP_P2_UP
         CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
-        SUB P2_CUR_Y,15
+        SUB P2_CUR_Y,10
         MOV_MEM P2_CUR_IMG_OFST,OFFSET jump2
         DRAW_IMG_AT jump2,P2_CUR_X,P2_CUR_Y
         DEC P2_UP_TASK_VALUE
@@ -1573,7 +1573,7 @@ P2_JUMPED_ALREADY_TASK_CHECK:;~~~~~~~~~~~P2_GOING DOWN AFTER JUMPING~~~~~~~~~
     CMP P2_JUMPED_ALREADY_TASK_VALUE,0
     JLE STOP_P2_JUMPED_ALREADY
         CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
-        ADD P2_CUR_Y,15
+        ADD P2_CUR_Y,10
         MOV_MEM P2_CUR_IMG_OFST,OFFSET jump2
         DRAW_IMG_AT jump2,P2_CUR_X,P2_CUR_Y
         DEC P2_JUMPED_ALREADY_TASK_VALUE
