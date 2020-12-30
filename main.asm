@@ -1,10 +1,10 @@
-include drawing.inc
-.model huge
-.Stack 64
-.data
+INCLUDE DRAWING.INC
+.MODEL HUGE
+.STACK 128
+.DATA
 
-backW equ 47
-backH equ 55
+backW DW 47
+backH DW 55
 back DB 23, 20, 17, 200, 24, 25, 172, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 23, 23, 21, 153, 150, 151, 173, 224, 24, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 24, 26, 24, 79, 56, 172, 128, 152, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -73,8 +73,8 @@ back DB 23, 20, 17, 200, 24, 25, 172, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 
 
-back2W equ 47
-back2H equ 55
+back2W DW 47
+back2H DW 55
 back2 DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 79, 24, 24, 177, 18, 20, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 29, 0, 24, 226, 172, 126, 150, 153, 21, 23, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -143,8 +143,8 @@ back2 DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 
 
-ballW equ 25
-ballH equ 15
+ballW DW 25
+ballH DW 15
 ball DB 0, 0, 0, 0, 12, 4, 111, 136, 4, 4, 4, 4, 4, 111, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 41, 41, 40, 40, 41, 40, 40, 41, 42, 42, 4 
  DB 12, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 42, 42, 42, 12, 14, 44, 42, 41, 43, 43, 43, 42, 4, 4, 23, 0, 0, 0, 0, 0, 0, 0, 0, 65, 41, 41, 41 
  DB 65, 92, 67, 14, 68, 65, 42, 41, 4, 42, 12, 40, 4, 12, 63, 0, 0, 0, 0, 0, 65, 42, 41, 40, 12, 92, 65, 12, 12, 12, 44, 42, 4, 23, 63, 63, 12, 4, 4, 136 
@@ -157,8 +157,8 @@ ball DB 0, 0, 0, 0, 12, 4, 111, 136, 4, 4, 4, 4, 4, 111, 12, 0, 0, 0, 0, 0, 0, 0
  DB 159, 160, 160, 12, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-ball2W equ 25
-ball2H equ 15
+ball2W DW 25
+ball2H DW 15
 ball2 DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 111, 4, 4, 4, 4, 4, 136, 111, 4, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 12, 4, 42, 42, 41, 40 
  DB 40, 41, 40, 40, 41, 41, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 4, 4, 42, 43, 43, 43, 41, 42, 44, 14, 12, 42, 42, 42, 42, 0, 0, 0, 0, 0, 0, 0 
  DB 63, 12, 4, 40, 12, 42, 4, 41, 42, 65, 68, 14, 67, 92, 65, 41, 41, 41, 65, 0, 0, 0, 0, 0, 0, 136, 4, 4, 12, 63, 63, 23, 4, 42, 44, 12, 12, 12, 65, 92 
@@ -171,8 +171,8 @@ ball2 DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 111, 4, 4, 4, 4, 4, 136, 111, 4, 12, 
  DB 63, 12, 160, 160, 159, 134, 4, 41, 41, 41, 64, 0, 0, 0, 0
 
 
-barryW equ 39
-barryH equ 52
+barryW DW 39
+barryH DW 52
 barry DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 245, 152, 175, 150, 25, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 151, 174, 24, 174, 24, 81, 0, 21 
  DB 21, 201, 224, 223, 23, 29, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 175, 24, 24, 26, 172, 25, 103, 0, 23, 24 
@@ -226,8 +226,8 @@ barry DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
  DB 0, 0, 90, 89, 91, 91, 66, 65, 140, 140, 67, 91, 91, 91, 0, 91, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-barry2W equ 39
-barry2H equ 52
+barry2W DW 39
+barry2H DW 52
 barry2 DB 0, 25, 150, 175, 152, 245, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 81 
  DB 24, 174, 24, 174, 151, 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 103, 25 
  DB 172, 26, 24, 24, 175, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 31, 29, 23, 223, 224, 201, 21, 21, 0, 0, 101, 173 
@@ -281,8 +281,8 @@ barry2 DB 0, 25, 150, 175, 152, 245, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
  DB 90, 90, 0, 90, 90, 89, 63, 136, 136, 12, 65, 89, 89, 88, 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-boxingW equ 55
-boxingH equ 57
+boxingW DW 55
+boxingH DW 57
 boxing DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 29, 207, 19, 27, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 21, 202, 200, 223, 175, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -364,8 +364,8 @@ boxing DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-boxing2W equ 55
-boxing2H equ 57
+boxing2W DW 55
+boxing2H DW 57
 boxing2 DB 0, 0, 0, 28, 27, 19, 207, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 102, 175, 223, 200, 202, 21, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 103, 9, 56, 152, 130, 225, 26, 0 
@@ -448,8 +448,8 @@ boxing2 DB 0, 0, 0, 28, 27, 19, 207, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
 
 
-coinW equ 22
-coinH equ 22
+coinW DW 22
+coinH DW 22
 coin DB 0, 0, 0, 0, 0, 26, 26, 25, 140, 116, 6, 6, 116, 140, 140, 140, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 24, 24, 164, 6, 6, 43, 43, 6, 6, 116, 140, 164, 25 
  DB 0, 0, 0, 0, 0, 0, 0, 26, 140, 43, 43, 43, 43, 43, 6, 6, 43, 6, 6, 6, 6, 6, 25, 0, 0, 0, 0, 0, 26, 140, 43, 44, 44, 43, 44, 44, 116, 115, 44, 43 
  DB 43, 43, 43, 6, 6, 25, 0, 0, 0, 26, 140, 43, 44, 43, 43, 44, 43, 6, 116, 115, 43, 43, 43, 43, 43, 6, 6, 6, 26, 0, 25, 140, 42, 44, 43, 43, 43, 43, 116, 115 
@@ -466,8 +466,8 @@ coin DB 0, 0, 0, 0, 0, 26, 26, 25, 140, 116, 6, 6, 116, 140, 140, 140, 25, 0, 0,
 
 
 
-fireW equ 44
-fireH equ 54
+fireW DW 44
+fireH DW 54
 fire DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 246, 224 
  DB 20, 151, 152, 152, 0, 0, 232, 209, 18, 18, 246, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 222, 221, 20, 26, 79, 173, 175, 0, 0, 17, 210, 163, 162, 174, 128, 223, 247, 0, 223, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -531,8 +531,8 @@ fire DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
 
 
 
-fire2W equ 44
-fire2H equ 54
+fire2W DW 44
+fire2H DW 54
 fire2 DB 175, 152, 151, 20, 224, 246, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 175, 173, 79, 26, 20, 221, 221, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 151, 245, 18, 18, 18, 232, 0, 0, 173, 172, 23, 26, 24, 224, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -595,8 +595,8 @@ fire2 DB 175, 152, 151, 20, 224, 246, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-firepowerW equ 22
-firepowerH equ 21
+firepowerW DW 22
+firepowerH DW 21
 firepower DB 0, 0, 0, 186, 0, 185, 4, 184, 4, 41, 4, 4, 112, 41, 4, 0, 113, 0, 0, 0, 0, 0, 0, 0, 0, 113, 185, 113, 6, 112, 41, 40, 42, 114, 41, 42, 114, 113, 4, 113 
  DB 0, 0, 0, 0, 0, 0, 0, 113, 113, 6, 41, 41, 42, 41, 43, 42, 42, 43, 42, 42, 4, 113, 0, 0, 0, 0, 0, 0, 0, 113, 6, 6, 41, 41, 41, 42, 41, 41, 42, 42 
  DB 43, 42, 6, 6, 4, 112, 0, 0, 0, 0, 0, 113, 41, 42, 41, 41, 40, 41, 41, 41, 41, 41, 42, 43, 41, 4, 4, 113, 185, 0, 113, 113, 0, 4, 42, 43, 42, 41, 41, 41 
@@ -611,8 +611,8 @@ firepower DB 0, 0, 0, 186, 0, 185, 4, 184, 4, 41, 4, 4, 112, 41, 4, 0, 113, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 113, 4, 4, 113, 112, 41, 4, 112, 112, 0, 0, 0, 0, 0, 0
 
 
-heartW equ 22
-heartH equ 22
+heartW DW 22
+heartH DW 22
 heart DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 184, 184, 16, 16, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 4, 112, 16, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 16, 184, 4, 4, 112, 184 
  DB 16, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 184, 4, 40, 40, 40, 112, 16, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 16, 184, 4, 4 
@@ -628,8 +628,8 @@ heart DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
  DB 16, 0, 0, 0
 
 
-jumpW equ 44
-jumpH equ 62
+jumpW DW 44
+jumpH DW 62
 jump DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 23, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 21, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 21, 21, 151, 29, 0, 0, 0, 0, 0, 0 
@@ -701,8 +701,8 @@ jump DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 23
  DB 0, 0, 0, 0, 0, 0, 0, 0
 
 
-jump2W equ 44
-jump2H equ 62
+jump2W DW 44
+jump2H DW 62
 jump2 DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 23, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 21, 26, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 151, 21, 21, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -774,8 +774,8 @@ jump2 DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 23, 28, 0,
  DB 0, 0, 0, 0, 0, 0, 0, 0
 
 
-kickingW equ 52
-kickingH equ 60
+kickingW DW 52
+kickingH DW 60
 kicking DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 23 
  DB 26, 26, 24, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 247, 199, 198, 199, 151, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -856,8 +856,8 @@ kicking DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 90, 89, 67, 66, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
 
 
-kicking2W equ 52
-kicking2H equ 60
+kicking2W DW 52
+kicking2H DW 60
 kicking2 DB 0, 0, 0, 0, 0, 0, 0, 0, 24, 24, 26, 26, 23, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 29, 151, 199, 198, 199, 247, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 23, 127, 151, 128, 223, 24, 0, 0, 0 
@@ -938,8 +938,8 @@ kicking2 DB 0, 0, 0, 0, 0, 0, 0, 0, 24, 24, 26, 26, 23, 27, 0, 0, 0, 0, 0, 0, 0,
  DB 65, 88, 89, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
 
 
-movingW equ 51
-movingH equ 54
+movingW DW 51
+movingH DW 54
 moving DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 19, 152, 175, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 20, 152, 152, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -1011,8 +1011,8 @@ moving DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  DB 30, 91, 90, 91, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-moving2W equ 51
-moving2H equ 54
+moving2W DW 51
+moving2H DW 54
 moving2 DB 0, 175, 152, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 152, 20, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 152, 175, 175, 21, 175, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
@@ -1084,8 +1084,8 @@ moving2 DB 0, 175, 152, 19, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 90, 91, 90, 91, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-powerupW equ 43
-powerupH equ 70
+powerupW DW 43
+powerupH DW 70
 powerup DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 26, 175, 224, 233, 172, 28, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 27, 22, 23, 165, 23, 153, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 91, 93, 0, 26, 20, 23, 24, 27, 172, 23, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28, 23, 22, 20, 20, 152, 20, 23, 28, 30, 30, 0, 30, 29, 0, 0, 0, 0, 0, 0, 0, 0, 91, 91, 21, 172, 23, 25, 25 
@@ -1164,8 +1164,8 @@ powerup DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
  DB 29, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-powerup2W equ 43
-powerup2H equ 70
+powerup2W DW 43
+powerup2H DW 70
 powerup2 DB 0, 0, 0, 0, 0, 0, 0, 28, 172, 233, 224, 175, 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 172, 27, 24, 23, 21, 26, 0, 90, 90, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 153, 23, 163, 23, 22 
  DB 27, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 27, 22, 25, 25, 23, 172, 21, 90, 90, 0, 0, 0, 0, 0, 0, 0, 0, 29, 30, 0, 30, 30, 28, 23, 20, 152, 20 
@@ -1244,8 +1244,8 @@ powerup2 DB 0, 0, 0, 0, 0, 0, 0, 28, 172, 233, 224, 175, 27, 0, 0, 0, 0, 0, 0, 0
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-standingW equ 36
-standingH equ 55
+standingW DW 36
+standingH DW 55
 standing DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 102, 17, 19, 24, 151, 0, 0, 0, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 175, 20, 173, 173, 152, 174, 210, 18, 128, 222, 246, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 152, 148, 24, 26, 79, 174, 152, 23, 25, 24, 23, 175, 151, 223, 200, 0, 0, 0 
@@ -1298,8 +1298,8 @@ standing DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
  DB 92, 89, 67, 25, 25, 91, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
-standing2W equ 36
-standing2H equ 55
+standing2W DW 36
+standing2H DW 55
 standing2 DB 150, 24, 231, 17, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 173, 172, 20, 175 
  DB 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 174, 79, 26, 24, 148, 150, 23, 0 
  DB 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 245, 222, 128, 18, 210, 174, 152, 152, 174, 26, 24, 23, 20, 19, 0, 0, 0, 0, 0 
@@ -1352,6 +1352,22 @@ standing2 DB 150, 24, 231, 17, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
  DB 162, 63, 63, 90, 89, 0, 88, 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 
+P1_CUR_IMG_OFST DW ?
+P1_CUR_X DB ?
+P1_CUR_Y DB ?
+
+P2_CUR_IMG_OFST DW ?
+P2_CUR_X DB ?
+P2_CUR_Y DB ?
+
+IMG_TO_DRAW_OFST DW ?
+IMG_X DW ?
+IMG_Y DW ?
+
+TEMPW DW ?
+
+GROUND_Y DW 200
+
 startX DW  0030
 startY DW  0200
 start2X Dw 0500
@@ -1364,91 +1380,67 @@ MAIN PROC FAR
 	       mov bx, 0100h        	; 640x400 screen graphics mode
 	       INT 10h              	;execute the configuration
 	    
-		;draw both players
-        beginning:
-		DrawImage standingW, standingH, standing, startX,startY
-		DrawImage standing2W, standing2H, standing2, start2X,startY
+        ;initial position
+        DRAW_IMG_AT standing,50,GROUND_Y 
+        DRAW_IMG_AT standing2,550,GROUND_Y
 
-		mov ah,0
-		int 16h ;get character
-		cmp al,7Ah
-		je kick1
-		cmp al,78h
-		je box1
-		cmp al,63h
-		je fireee1
-		cmp al,76h
-		je barrry1
-		cmp al,69h
-		je kick2
-		cmp al,6fh
-		je box2
-		cmp al,70h
-		je fireee2
-		cmp al,6Ch
-		je barrry2
-
-		jmp beginning
-		
-		box1:
-		ClearImage standingW, standingH, startX,startY
-		DrawImage boxingW, boxingH, boxing, startX,startY
-		 call delay
-		ClearImage boxingW, boxingH, startX,startY
-		jmp beginning
-		
-		box2:
-		ClearImage standing2W, standing2H, start2X,startY
-		DrawImage boxing2W, boxing2H, boxing2, start2XX,startY
-		 call delay
-		ClearImage boxing2W, boxing2H, start2XX,startY
-		jmp beginning
-
-		kick1:
-		ClearImage standingW, standingH, startX,startY
-		DrawImage kickingW, kickingH, kicking, startX,startY
-		 call delay
-		ClearImage kickingW, kickingH, startX,startY
-		jmp beginning
-		
-		kick2:
-		ClearImage standing2W, standing2H, start2X,startY
-		DrawImage kicking2W, kicking2H, kicking2, start2XX,startY
-		 call delay
-		ClearImage kicking2W, kicking2H, start2XX,startY
-		jmp beginning
-
-		fireee1:
-		ClearImage standingW, standingH, startX,startY
-		DrawImage fireW, fireH, fire, startX,startY
-		 call delay
-		ClearImage fireW, fireH, startX,startY
-		jmp beginning
-		
-		fireee2:
-		ClearImage standing2W, standing2H, start2X,startY
-		DrawImage fire2W, fire2H, fire2, start2XX,startY
-		 call delay
-		ClearImage fire2W, fire2H, start2XX,startY
-		jmp beginning
-
-		barrry1:
-		ClearImage standingW, standingH, startX,startY
-		DrawImage barryW, barryH, barry, startX,startY
-		 call delay
-		ClearImage barryW, barryH, startX,startY
-		jmp beginning
-		
-		barrry2:
-		ClearImage standing2W, standing2H, start2X,startY
-		DrawImage barry2W, barry2H, barry2, start2XX,startY
-		 call delay
-		ClearImage barry2W, barry2H, start2XX,startY
-		jmp beginning
-
+        L1:
+        MOV CX,2
+        LOOP L1
 	MAIN ENDP
 
+DRAW_IMG PROC
+        MOV AH,0Bh   	;set the configuration
+        mov DI, IMG_TO_DRAW_OFST
+        MOV CX, [DI-4]  ;width is current-4
+        MOV DX, [DI-2] 	;height is current-2
+        jmp Start    	;Avoid drawing before the calculations
+	Drawit:
+        add CX,IMG_X
+        add DX,IMG_Y
+        MOV AH,0Ch   	;set the configuration to writing a pixel
+        mov al,[DI]     ; color of the current coordinates
+        MOV BH,00h   	;set the page number
+        INT 10h      	;execute the configuration
+        sub CX,IMG_X
+        sub DX,IMG_Y
+	Start: 
+		inc DI
+	    DEC Cx       	;  loop iteration in x direction
+	    JNZ Drawit      	;  check if we can draw c urrent x and y and excape the y iteration
+        MOV BX, IMG_TO_DRAW_OFST
+	    mov Cx, [BX - 4] 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
+        DEC DX       	;  loop iteration in y direction
+	    JZ  ENDDRAWING   	;  both x and y reached 00 so end program
+		Jmp Drawit
+	ENDDRAWING:
+    RET
+DRAW_IMG ENDP
 
+CLEAR_IMG PROC
+        MOV AH,0Bh   	;set the configuration
+        MOV DI,IMG_TO_DRAW_OFST
+        MOV CX, [DI-4]  	;set the width (X)
+        MOV DX, [DI-2] 	;set the hieght (Y)
+        jmp Startt    	;Avoid drawing before the calculations
+	Drawitt:
+        add CX,IMG_X
+        add DX,IMG_Y
+        MOV AH,0Ch   	;set the configuration to writing a pixel
+        mov al, 0     ; color of the current coordinates
+        MOV BH,00h   	;set the page number
+        INT 10h      	;execute the configuration
+        sub CX,IMG_X
+        sub DX,IMG_Y
+	Startt: 
+        DEC Cx       	;  loop iteration in x direction
+        JNZ Drawitt      	;  check if we can draw c urrent x and y and excape the y iteration
+        mov Cx, [DI-4] 	;  if loop iteration in y direction, then x should start over so that we sweep the grid
+        DEC DX       	;  loop iteration in y direction
+        JZ  ENDCLEARING   	;  both x and y reached 00 so end program
+        Jmp Drawitt
+	ENDCLEARING:
+CLEAR_IMG ENDP
 delay    PROC    
        MOV     CX, 0003H
         MOV     DX, 0D40H
