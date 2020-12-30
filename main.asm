@@ -1351,7 +1351,7 @@ standing2 DB 150, 24, 231, 17, 102, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
  DB 90, 90, 88, 12, 136, 160, 162, 65, 89, 88, 88, 89, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 89, 162 
  DB 162, 63, 63, 90, 89, 0, 88, 88, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
-;INPUT KEYS
+;######INPUT KEYS#########
 ;PLAYER2
 ;Scan Code
 P2_LEFT_ARROW DB 4BH
@@ -1364,22 +1364,23 @@ P2_FIRE DB 'i'
 P2_POWER_UP DB 'u'
 
 ;PLAYER1
-P2_LEFT_ARROW DB 'a'
-P2_RIGHT_ARROW DB 'd'
-P2_UP_ARROW DB 'w'
+P1_LEFT_ARROW DB 'a'
+P1_RIGHT_ARROW DB 'd'
+P1_UP_ARROW DB 'w'
 ;ASCII
-P2_BOX DB 'c'
-P2_KICK DB 'v'
-P2_FIRE DB 'b'
-P2_POWER_UP DB 'n'
-;IMAGE HANDLING
+P1_BOX DB 'c'
+P1_KICK DB 'v'
+P1_FIRE DB 'b'
+P1_POWER_UP DB 'n'
+
+;#####IMAGE HANDLING#######
 P1_CUR_IMG_OFST DW ?
-P1_CUR_X DB ?
-P1_CUR_Y DB ?
+P1_CUR_X DW ?
+P1_CUR_Y DW ?
 
 P2_CUR_IMG_OFST DW ?
-P2_CUR_X DB ?
-P2_CUR_Y DB ?
+P2_CUR_X DW ?
+P2_CUR_Y DW ?
 
 IMG_TO_DRAW_OFST DW ?
 IMG_X DW ?
@@ -1388,9 +1389,17 @@ IMG_Y DW ?
 P1_PREV_IMG_OFST DW ?
 P2_PREV_IMG_OFST DW ?
 
+GROUND_Y DW 200
+
+;########TASK HANDLING######
+
+;LEFT PRESS TASK 
+P2_LEFT_TASK_BOOL DB 0   ;0 If doesn't have to go left, 1 else
+P2_LEFT_TASK_VALUE DB 0  ;VALUE TO GO LEFT
+
+
 TEMPW DW ?
 
-GROUND_Y DW 200
 
 .CODE
 MAIN PROC FAR
@@ -1401,23 +1410,83 @@ MAIN PROC FAR
 	       INT 10h              	;execute the configuration
 	    
         ;initial position
-        DRAW_IMG_AT standing,50,GROUND_Y     ;Player1 on the ground
+        DRAW_IMG_AT standing,50,GROUND_Y     ;Player1 on the ground TODO: GROUND IS WRONG
+        MOV P1_CUR_X,50
+        MOV AX,GROUND_Y
+        MOV P1_CUR_Y,AX
         MOV AX,IMG_TO_DRAW_OFST              ;Player1's img variable update
         MOV P1_CUR_IMG_OFST,AX               
+
         DRAW_IMG_AT standing2,550,GROUND_Y   ;Player2 on the ground
+        MOV P2_CUR_X,550
+        MOV AX,GROUND_Y
+        MOV P2_CUR_Y,AX
         MOV AX,IMG_TO_DRAW_OFST              ;Player1's img variable update
         MOV P2_CUR_IMG_OFST,AX          
         
         INFINITE_LOOP:
         ;get character
-        mov ah,0
-		int 16h 
+
+        MOV AH,01H
+        INT 16H;ZF = 1 IF NO INPUT
+        JZ END_OF_INPUT
+        mov ah,0 ;THERE IS AN INPUT, TAKE IT
+	int 16h 
         
 
-
+        P2_LA_CHECK:
+        CMP AH,P2_LEFT_ARROW ; LEFT ARROW PRESSED?
+        
+        JNZ P2_RA_CHECK
+            ;HERE LEFT ARROW IS PRESSED
+            MOV P2_LEFT_TASK_BOOL,1   ;ACTIVATE TASK
+            MOV P2_LEFT_TASK_VALUE,20 ;MOVE 20PX
+            JMP END_OF_INPUT
+        P2_RA_CHECK:
+        
+        END_OF_INPUT:
+        CALL CONTINUE_TASKS
         JMP INFINITE_LOOP
         
-	MAIN ENDP
+MAIN ENDP
+
+CONTINUE_TASKS PROC
+	P2_LA_TASK_CHECK:
+    CMP P2_LEFT_TASK_BOOL,1 ; LEFT ARROW P2 ACTIVATED?
+    JNZ P2_RA_TASK_CHECK
+    CMP P2_LEFT_TASK_VALUE,0
+    JZ STOP_P2
+        ; HIT_P1:;?
+
+        ; MOV BX, P2_CUR_IMG_OFST
+        ; SUB BX,4 ; NOW HAS THE WIDTH OFFSET OF P1
+        ; MOV AX,P1_CUR_X
+        ; ADD AX,[BX];NOW HAS PLAYER2 END
+        ; MOV BX,P2_CUR_X ; WILL SUBTRACT 1 FROM IT TO CHECK (MOVE 1PX TO THE LEFT)
+        ; SUB BX,1
+        ; CMP AX,BX ; P1,P2 WILL HIT?
+        ; JGE STOP_P2
+        
+        CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
+        DEC P2_CUR_X
+        MOV AX, OFFSET moving2
+        MOV P2_CUR_IMG_OFST,AX
+        DRAW_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
+        
+        STOP_P2:
+        CLEAR_IMG_AT P2_CUR_IMG_OFST,P2_CUR_X,P2_CUR_Y
+        MOV AX, OFFSET standing2
+        MOV P2_CUR_IMG_OFST,AX
+        DRAW_IMG_AT standing2,P2_CUR_X,P2_CUR_Y
+        MOV P2_LEFT_TASK_BOOL,0
+        MOV P2_LEFT_TASK_VALUE,0
+        
+    P2_RA_TASK_CHECK:
+
+    SMALLEST_DELAY:
+    CALL SMALL_DELAY
+    RET
+CONTINUE_TASKS ENDP
 
 DRAW_IMG PROC
         MOV AH,0Bh   	;set the configuration
@@ -1471,7 +1540,13 @@ CLEAR_IMG PROC
         Jmp Drawitt
 	ENDCLEARING:
 CLEAR_IMG ENDP
-
+SMALL_DELAY    PROC    
+        MOV     CX, 0003H
+        MOV     DX, 0D40H
+        MOV     AH, 86H
+        INT     15H 
+        RET
+SMALL_DELAY    ENDP   
 delay    PROC    
         MOV     CX, 0003H
         MOV     DX, 0D40H
@@ -1479,4 +1554,43 @@ delay    PROC
         INT     15H 
         RET
 delay    ENDP    
+
+PRINT_AN_INPUT PROC
+        ;SET CURSRO
+        PUSH AX
+        PUSH BX
+        PUSH CX
+        PUSH DX
+
+        PUSH AX
+        MOV AH,2
+        MOV DH,10
+        MOV DL,20
+        MOV BH,0
+        INT 10H
+        POP AX
+        MOV CX,1
+        MOV BH,0
+        MOV DL,AL
+        MOV DH,AH
+        MOV AH,0AH
+        MOV AL,DL
+        INT 10H
+        PUSH DX
+        CALL delay
+        POP DX
+        MOV BH,0
+        MOV CX,1
+        MOV DL,DH
+        MOV AH,0AH
+        MOV AL,DH
+        INT 10H
+
+        POP AX
+        POP BX
+        POP CX
+        POP DX
+        RET
+PRINT_AN_INPUT ENDP
 END MAIN
+
