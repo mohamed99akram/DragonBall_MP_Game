@@ -2,6 +2,9 @@ include drawing.inc
 .model huge
 .Stack 128
 .data
+;use ml assembler for this to work
+;use ctrl F12 to increase cycles
+;use ctrl F11 to decrease cycles
 	                  include images.inc
 	start1X           equ     50
 	startY            equ     195
@@ -78,6 +81,19 @@ include drawing.inc
 
 	MovingFactor      db      1
 
+
+	tempw1            dw      ?
+	tempw2            dw      ?
+
+
+	p1_score          db      100
+	p2_score          db      100
+
+	current_power_up  dw      ?
+	powerup_x         dw      50,100,80,400,500,200,300
+	powerup_y         dw      300,300,300,300,300,300,300
+	powerup_counter   dw      0
+
 .CODE
 MAIN PROC FAR
 	                 mov        ax, @data
@@ -85,7 +101,8 @@ MAIN PROC FAR
 	                 mov        ax, 4F02h                                                  	;
 	                 mov        bx, 0100h                                                  	; 640x400 screen graphics mode
 	                 INT        10h                                                        	;execute the configuration
-
+	;ClearImage 640,400,0,0
+	                 ClearImage 2,100,10,10
 	                 DrawImage  standingW, standingH, standing, P1_CUR_X, P2_CUR_Y
 	                 DrawImage  standing2W, standing2H, standing2, P2_CUR_X,P2_CUR_Y
 	;draw both players
@@ -121,15 +138,15 @@ MAIN PROC FAR
 	                 cmp        al,P1_BARRY
 	                 je         barrry1
 
-	                 cmp        ah,P1_UP_ARROW
+	                 cmp        al,P1_UP_ARROW
 	                 je         p1_jump
 	Check_LeftP1:    
-	                 cmp        ah, P1_LEFT_ARROW
+	                 cmp        al, P1_LEFT_ARROW
 	                 je         p1_left
 	Check_RightP1:   
 	                 cmp        P1_state, State_Left
 	                 je         check_p2_state
-	                 cmp        ah, P1_RIGHT_ARROW
+	                 cmp        al, P1_RIGHT_ARROW
 	                 je         p1_right
 
 	;;if player2 is not standing don't take input
@@ -169,17 +186,28 @@ MAIN PROC FAR
 	                 jmp        END_OF_INPUT
 
 	p1_left:         
+	                 MOV        P1_state, State_Left
+	                 MOV        P1_state_count, Left_Counting
+	                 ClearImage standingW, standingH, P1_CUR_X,P1_CUR_Y
+	                 DrawImage  backW, backH, back, P1_CUR_X,P1_CUR_Y
 	                 jmp        END_OF_INPUT
 
 	p1_right:        
+	                 MOV        P1_state, State_Right
+	                 MOV        P1_state_count, Right_Counting
+	                 ClearImage standingW, standingH, P1_CUR_X,P1_CUR_Y
+	                 DrawImage  movingW, movingH, moving, P1_CUR_X,P1_CUR_Y
 	                 jmp        END_OF_INPUT
 	p1_jump:         
+	                 MOV        P1_state, State_Jump_Up
+	                 MOV        P1_state_count, JumpUp_Counting
+	                 ClearImage standingW, standingH, P1_CUR_X,P1_CUR_Y
+	                 DrawImage  JumpW, JumpH, Jump, P1_CUR_X,P1_CUR_Y
 	                 jmp        END_OF_INPUT
 
 	p2_left:         
 	                 MOV        P2_state, State_Left                                       	;ACTIVATE TASK
 	                 MOV        P2_state_count, Left_Counting                              	;VALUE=5, ARBITRARY ACUTALLY, ADD FOR MANY PRESSES
-	;MOV_MEM    P2_PREV_IMG_OFST,P2_CUR_IMG_OFST
 	                 ClearImage standing2W, standing2H, P2_CUR_X,P2_CUR_Y
 	                 DrawImage  moving2W, moving2H, moving2, P2_CUR_X,P2_CUR_Y
 	                 jmp        END_OF_INPUT
@@ -360,9 +388,25 @@ CONTINUE_TASKS PROC
 	L14:             cmp        P2_state, State_Jump_Down
 	                 jne        L15
 	                 call       UpdateP2JumpDown
-	L15:             
-	                 call       delay
 
+	L15:             cmp        P1_state, State_Left
+	                 jne        L16
+	                 call       UpdateP1Left
+
+	L16:             cmp        P1_state, State_Right
+	                 jne        L17
+	                 call       UpdateP1Right
+
+	L17:             cmp        P1_state, State_Jump_Up
+	                 jne        L18
+	                 call       UpdateP1JumpUp
+
+	L18:             cmp        P1_state, State_Jump_Down
+	                 jne        L19
+	                 call       UpdateP1JumpDown
+
+	L19:             
+	                 call       delay
 	                 RET
 CONTINUE_TASKS ENDP
 
@@ -458,7 +502,7 @@ UpdateBall1 PROC
 	                 ClearImage ballW,ballH,startball1X,startball1Y
 
 	                 cmp        Ball2_State,State_BallMoving
-	                 jne        Check_for_P2
+	                 jne        Check_for_P2_Y
 	                 mov        ax, startball1X
 	                 add        ax, ballW
 	                 mov        bx, startball2x
@@ -466,7 +510,16 @@ UpdateBall1 PROC
 	                 cmp        bx,5
 	                 jle        ClearBothBalls
 
-	Check_for_P2:    
+	Check_for_P2_Y:  
+	                 mov        ax, P2_CUR_Y
+	                 add        ax, jump2H
+	                 mov        bx, startball1Y
+	                 sub        bx,ax
+	                 cmp        bx,5
+	                 jle        Check_for_P2_X
+	                 jmp        continue
+					
+	Check_for_P2_X:  
 	                 mov        ax, startball1X
 	                 add        ax, ballW
 	                 MOV_MEM    P2_Calculated_X, P2_CUR_X
@@ -474,10 +527,18 @@ UpdateBall1 PROC
 	                 cmp        ax,P2_Calculated_X
 	                 mov        bx, P2_Calculated_X
 	                 sub        bx,ax
-	                 cmp        bx,3
+	                 cmp        bx,5
+	                 jg         continue
+	                 mov        ax,startball1X
+	                 mov        bx, P2_CUR_X
+	                 add        bx, standing2W
+	                 sub        ax,bx
+	                 cmp        ax,5
 	                 jle        ClearBall
-
+	continue:        
 	                 mov        bx, GraphEnd
+	                 mov        ax, startball1X
+	                 add        ax, ballW
 	                 sub        bx,ax
 	                 cmp        bx,3
 	                 jle        ClearBall
@@ -501,14 +562,30 @@ UpdateBall1 ENDP
 
 UpdateBall2 PROC
 	                 ClearImage ball2W,ball2H,startball2X,startball2Y
- 
+	Check_for_P1_Y:  
+	                 mov        ax, P1_CUR_Y
+	                 add        ax, jumpH
+	                 mov        bx, startball2Y
+	                 sub        bx,ax
+	                 cmp        bx,5
+	                 jle        Check_for_P1_X
+	                 jmp        continue
+
+	Check_for_P1_X:  
 	                 mov        ax, startball2X
 	                 mov        Bx, P1_CUR_X
-	                 add        Bx, 40
+	                 add        Bx, 40                                                     	;might change that to current width
 	                 sub        ax,bx
 	                 cmp        ax,3
+	                 jg         continue
+	                 mov        ax,startball2X
+	                 add        ax, ball2W
+	                 mov        bx, P1_CUR_X
+	                 sub        bx, ax
+	                 cmp        bx,3
 	                 jle        ClearBall
 
+	continue:        
 	                 sub        ax, GraphBegin
 	                 cmp        ax,3
 	                 jle        ClearBall
@@ -526,7 +603,7 @@ UpdateBall2 ENDP
 
 
 UpdateP2Left PROC
-	                 ClearImage moving2W,moving2H,P2_CUR_X,P2_CUR_Y
+	;  ClearImage moving2W,moving2H,P2_CUR_X,P2_CUR_Y
 	                 mov        al,MovingFactor
 	                 mov        ah,0
 	                 sub        P2_state_count, ax
@@ -543,14 +620,48 @@ UpdateP2Left PROC
 	                 mov        al,2
 	                 mul        MovingFactor
 	                 sub        P2_CUR_X,ax
+	;clear some px
+	                 MOV_MEM    tempw1,P2_CUR_X
+	                 ADD_MEM    tempw1,moving2W
+	                 MOV        tempw2,AX
+	                 ClearImage tempw2,moving2H,tempw1,P2_CUR_Y
+
 	                 DrawImage  moving2W, moving2H, moving2, P2_CUR_X,P2_CUR_Y
 	                 RET
 
 	endfunc:         
+	                 ClearImage moving2W,moving2H,P2_CUR_X,P2_CUR_Y
 	                 mov        P2_state,State_Standing
 	                 DrawImage  standing2W, standing2H, standing2, P2_CUR_X,P2_CUR_Y
 	                 RET
 UpdateP2Left ENDP
+
+UpdateP1Left PROC
+	                 ClearImage backW,backH,P1_CUR_X,P1_CUR_Y
+	                 mov        al,MovingFactor
+	                 mov        ah,0
+	                 sub        P1_state_count, ax
+	                 cmp        P1_state_count, 0
+	                 jle        endfunc
+		
+	                 mov        bx, GraphBegin
+	                 mov        ax,P1_CUR_X
+	                 sub        ax,bx
+	                 cmp        ax,3
+	                 jle        endfunc
+
+					
+	                 mov        al,2
+	                 mul        MovingFactor
+	                 sub        P1_CUR_X,ax
+	                 DrawImage  backW, backH, back, P1_CUR_X,P1_CUR_Y
+	                 RET
+
+	endfunc:         
+	                 mov        P1_state,State_Standing
+	                 DrawImage  standingW, standingH, standing, P1_CUR_X,P1_CUR_Y
+	                 RET
+UpdateP1Left ENDP
 
 UpdateP2Right PROC
 	                 ClearImage back2W,back2H,P2_CUR_X,P2_CUR_Y
@@ -575,10 +686,36 @@ UpdateP2Right PROC
 
 	endfunc:         
 	                 mov        P2_state,State_Standing
+					 
 	                 DrawImage  standing2W, standing2H, standing2, P2_CUR_X,P2_CUR_Y
 	                 RET
 UpdateP2Right ENDP
+UpdateP1Right PROC
+	                 ClearImage movingW,movingH,P1_CUR_X,P1_CUR_Y
+	                 mov        al,MovingFactor
+	                 mov        ah,0
+	                 sub        P1_state_count, ax
+	                 cmp        P1_state_count, 0
+	                 jle        endfunc
+	;cmp
+	                 mov        ax, P2_CUR_X
+	                 mov        Bx, P1_CUR_X
+	                 add        Bx, 50
+	                 sub        ax,bx
+	                 cmp        ax,3
+	                 jle        endfunc
 
+	                 mov        al,2
+	                 mul        MovingFactor
+	                 add        P1_CUR_X,ax
+	                 DrawImage  movingW, movingH, moving, P1_CUR_X,P1_CUR_Y
+	                 RET
+
+	endfunc:         
+	                 mov        P1_state,State_Standing
+	                 DrawImage  standingW, standingH, standing, P1_CUR_X,P1_CUR_Y
+	                 RET
+UpdateP1Right ENDP
 UpdateP2JumpUp PROC
 	                 ClearImage jump2W,jump2H,P2_CUR_X,P2_CUR_Y
 	                 mov        al,MovingFactor
@@ -598,7 +735,25 @@ UpdateP2JumpUp PROC
 	                 mov        P2_state_count, JumpDown_Counting
 	                 RET
 UpdateP2JumpUp ENDP
-
+UpdateP1JumpUp PROC
+	                 ClearImage jumpW,jumpH,P1_CUR_X,P1_CUR_Y
+	                 mov        al,MovingFactor
+	                 mov        ah,0
+	                 sub        P1_state_count, ax
+	                 cmp        P1_state_count, 0
+	                 jle        endfunc
+                     
+	                 mov        al,1
+	                 mul        MovingFactor
+	                 sub        P1_CUR_Y,ax
+	                 DrawImage  JumpW, JumpH, Jump, P1_CUR_X,P1_CUR_Y
+	                 RET
+	endfunc:         
+	                 mov        P1_state,State_Jump_Down
+	                 DrawImage  JumpW, JumpH, Jump, P1_CUR_X,P1_CUR_Y
+	                 mov        P1_state_count, JumpDown_Counting
+	                 RET
+UpdateP1JumpUp ENDP
 
 UpdateP2JumpDown PROC
 	                 ClearImage jump2W,jump2H,P2_CUR_X,P2_CUR_Y
@@ -615,13 +770,33 @@ UpdateP2JumpDown PROC
 	                 RET
 	endfunc:         
 	                 mov        P2_state,State_Standing
+	                 mov        P2_CUR_Y, startY
 	                 DrawImage  standing2W, standing2H, standing2, P2_CUR_X,P2_CUR_Y
 	                 RET
 UpdateP2JumpDown ENDP
 
+UpdateP1JumpDown PROC
+	                 ClearImage jumpW,jumpH,P1_CUR_X,P1_CUR_Y
+	                 mov        al,MovingFactor
+	                 mov        ah,0
+	                 sub        P1_state_count, ax
+	                 cmp        P1_state_count, 0
+	                 jle        endfunc
+                     
+	                 mov        al,1
+	                 mul        MovingFactor
+	                 add        P1_CUR_Y,ax
+	                 DrawImage  JumpW, JumpH, Jump, P1_CUR_X,P1_CUR_Y
+	                 RET
+	endfunc:         
+	                 mov        P1_state,State_Standing
+	                 mov        P1_CUR_Y, startY
+	                 DrawImage  standingW, standingH, standing, P1_CUR_X,P1_CUR_Y
+	                 RET
+UpdateP1JumpDown ENDP
 
 CalculateFactor PROC
-					mov MovingFactor,1
+	                 mov        MovingFactor,1
 	                 cmp        P1_State, State_Jump_Up
 	                 jne        L2
 	                 add        MovingFactor,4
@@ -689,5 +864,11 @@ delay PROC
 	                 INT        15H
 	                 RET
 delay ENDP
-  
+big_delay proc
+	                 MOV        CX, 0000H
+	                 MOV        DX, 0ffDCH
+	                 MOV        AH, 86H
+	                 INT        15H
+	                 RET
+big_delay endp
 END MAIN
