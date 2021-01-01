@@ -2,97 +2,116 @@ include drawing.inc
 .model huge
 .Stack 128
 .data
-;use ml assembler for this to work
-;use ctrl F12 to increase cycles
-;use ctrl F11 to decrease cycles
-	                  include images.inc
-	start1X           equ     50
-	startY            equ     195
-	start2X           equ     550
+	;use ml assembler for this to work
+	;use ctrl F12 to increase cycles
+	;use ctrl F11 to decrease cycles
+	                    include images.inc
+	start1X             equ     50
+	startY              equ     195
+	start2X             equ     550
 	
-	GROUND_Y          equ     250
+	GROUND_Y            equ     250
 
-	P2_difference     equ     20
+	P2_difference       equ     20
 
-	P1_CUR_X          DW      start1X
-	P1_CUR_Y          DW      startY
+	P1_CUR_X            DW      start1X
+	P1_CUR_Y            DW      startY
 
-	P2_CUR_X          DW      start2X
-	P2_Calculated_X   DW      ?
-	P2_CUR_Y          DW      startY
+	P2_CUR_X            DW      start2X
+	P2_Calculated_X     DW      ?
+	P2_CUR_Y            DW      startY
 
-	startball1X       DW      0
-	startball1Y       DW      0
-	startball2X       DW      0
-	startball2Y       DW      0
+	startball1X         DW      0
+	startball1Y         DW      0
+	startball2X         DW      0
+	startball2Y         DW      0
 
-	P2_LEFT_ARROW     DB      4BH
-	P2_RIGHT_ARROW    DB      4DH
-	P2_UP_ARROW       DB      48H
+	P2_LEFT_ARROW       DB      4BH
+	P2_RIGHT_ARROW      DB      4DH
+	P2_UP_ARROW         DB      48H
 	
 	;PLAYER1
-	P1_LEFT_ARROW     DB      'a'
-	P1_RIGHT_ARROW    DB      'd'
-	P1_UP_ARROW       DB      'w'
+	P1_LEFT_ARROW       DB      'a'
+	P1_RIGHT_ARROW      DB      'd'
+	P1_UP_ARROW         DB      'w'
 
-	P2_BOX            DB      'p'
-	P2_KICK           DB      'o'
-	P2_FIRE           DB      'i'
-	P2_BARRY          DB      'u'
+	P2_BOX              DB      'p'
+	P2_KICK             DB      'o'
+	P2_FIRE             DB      'i'
+	P2_BARRY            DB      'u'
 
-	P1_BOX            DB      'c'
-	P1_KICK           DB      'v'
-	P1_FIRE           DB      'b'
-	P1_BARRY          DB      'n'
+	P1_BOX              DB      'c'
+	P1_KICK             DB      'v'
+	P1_FIRE             DB      'b'
+	P1_BARRY            DB      'n'
 
-	P1_state          db      0
-	P2_state          db      0
+	P1_state            db      0
+	P2_state            db      0
 
-	State_Standing    equ     0
-	State_Kicking     equ     1
-	State_Boxing      equ     2
-	State_Fire        equ     3
-	State_Barry       equ     4
-	State_Right       equ     5
-	State_Left        equ     6
-	State_Jump_Up     equ     7
-	State_Jump_Down   equ     8
+	State_Standing      equ     0
+	State_Kicking       equ     1
+	State_Boxing        equ     2
+	State_Fire          equ     3
+	State_Barry         equ     4
+	State_Right         equ     5
+	State_Left          equ     6
+	State_Jump_Up       equ     7
+	State_Jump_Down     equ     8
 
-	State_BallMoving  equ     1
-	State_NoBall      equ     0
+	State_BallMoving    equ     1
+	State_NoBall        equ     0
 
-	Kicking_Counting  equ     100
-	Boxing_Counting   equ     100
-	Fire_Counting     equ     100
-	Barry_Counting    equ     100
-	Left_Counting     equ     17
-	Right_Counting    equ     17
-	JumpUp_Counting   equ     100
-	JumpDown_Counting equ     100
+	Kicking_Counting    equ     100
+	Boxing_Counting     equ     100
+	Fire_Counting       equ     100
+	Barry_Counting      equ     100
+	Left_Counting       equ     17
+	Right_Counting      equ     17
+	JumpUp_Counting     equ     100
+	JumpDown_Counting   equ     100
 
-	P1_state_count    dw      0
-	P2_state_count    dw      0
+	P1_state_count      dw      0
+	P2_state_count      dw      0
 
-	Ball1_State       db      0
-	Ball2_State       db      0
+	Ball1_State         db      0
+	Ball2_State         db      0
 
-	GraphBegin        equ     10
-	GraphEnd          equ     630
+	GraphBegin          equ     10
+	GraphEnd            equ     630
 
-	MovingFactor      db      1
-
-
-	tempw1            dw      ?
-	tempw2            dw      ?
+	MovingFactor        db      1
 
 
-	p1_score          db      100
-	p2_score          db      100
+	tempw1              dw      ?
+	tempw2              dw      ?
 
-	current_power_up  dw      ?
-	powerup_x         dw      50,100,80,400,500,200,300
-	powerup_y         dw      300,300,300,300,300,300,300
-	powerup_counter   dw      0
+
+	p1_health           db      100
+	p2_health           db      100
+
+	powerup_x           dw      75,100,80,400,500,200,300,70,85,10,600
+	powerup_y           dw      200,200,200,200,200,200,200,200,200,200,200
+	powerup_counter     dw      0                                          	; AFTER A NUMBER OF LOOPS, A NEW POWERUP SHOULD APPEAR
+
+	cur_pow_up_x_OFST   dw      0
+	cur_pow_up_y_OFST   dw      0                                          	;BOTH INCREASE EVERY UPDATE TO POINT TO ARRAY ELEMENT
+	
+	POWERUPS_STATES_NUM EQU     4                                          	; NUMBER OF STATES
+
+	State_no_powerup    EQU     0
+	State_heart         EQU     1
+	State_coin          EQU     2
+	State_fire_power    EQU     3
+	BOOL_no_powerup     DB      0
+	BOOL_heart          DB      0
+	BOOL_coin           DB      0
+	BOOL_fire_power     DB      0
+
+	CUR_POW_UP_STATE    DB      State_no_powerup                           	;CURRENT STATE
+	PREV_POW_UP         DB      State_no_powerup                           	;PREVIOUS STATE
+	POW_UP_TO_MAKE      DB      State_heart
+	; State_cola        EQU      4
+	; State_cake        EQU      5
 
 .CODE
 MAIN PROC FAR
@@ -102,9 +121,13 @@ MAIN PROC FAR
 	                 mov        bx, 0100h                                                  	; 640x400 screen graphics mode
 	                 INT        10h                                                        	;execute the configuration
 	;ClearImage 640,400,0,0
-	                 ClearImage 2,100,10,10
 	                 DrawImage  standingW, standingH, standing, P1_CUR_X, P2_CUR_Y
 	                 DrawImage  standing2W, standing2H, standing2, P2_CUR_X,P2_CUR_Y
+
+	;POWER UP INITIALIZATION
+	                 MOV_MEM    cur_pow_up_x_OFST,OFFSET powerup_x
+	                 MOV_MEM    cur_pow_up_y_OFST,OFFSET powerup_y
+
 	;draw both players
 	Forever:         
 	
@@ -313,6 +336,57 @@ MAIN PROC FAR
 	                 jmp        END_OF_INPUT
 
 	END_OF_INPUT:    
+	;draw POWER UPS
+	                 INC        powerup_counter
+	                 CMP        powerup_counter,500
+	                 JNZ        TASKS
+					
+	                 MOV        powerup_counter,0
+	                 INC        POW_UP_TO_MAKE
+	                 CMP        POW_UP_TO_MAKE,POWERUPS_STATES_NUM
+	                 JNZ        LBL1
+	                 MOV        POW_UP_TO_MAKE,1
+	LBL1:            
+	                 ADD        cur_pow_up_x_OFST,2
+	                 ADD        cur_pow_up_y_OFST,2
+	                 MOV        AX,OFFSET powerup_y
+	                 CMP        cur_pow_up_x_OFST,AX
+	                 JNE        LBL2
+	                 MOV_MEM    cur_pow_up_x_OFST,OFFSET powerup_x
+	                 MOV_MEM    cur_pow_up_y_OFST,OFFSET powerup_y
+
+	LBL2:            
+	                 CMP        POW_UP_TO_MAKE,State_heart
+	                 JNZ        LBL3
+	                 MOV        BX,cur_pow_up_x_OFST
+	                 MOV        DI,cur_pow_up_y_OFST
+	                 MOV_MEM    tempw1,[BX]
+	                 MOV_MEM    tempw2,[DI]
+	                 DrawImage  heartW, heartH, heart, tempw1,tempw2
+	                 mov        BOOL_heart,1
+	                 JMP        TASKS
+	LBL3:            
+	                 CMP        POW_UP_TO_MAKE,State_coin
+	                 JNZ        LBL4
+	                 MOV        BX,cur_pow_up_x_OFST
+	                 MOV        DI,cur_pow_up_y_OFST
+	                 MOV_MEM    tempw1,[BX]
+	                 MOV_MEM    tempw2,[DI]
+	                 DrawImage  coinW, coinH, coin, tempw1,tempw2
+	                 mov        BOOL_coin,1
+	                 JMP        TASKS
+	LBL4:            
+	                 CMP        POW_UP_TO_MAKE,State_fire_power
+	                 JNZ        LBL5
+	                 MOV        BX,cur_pow_up_x_OFST
+	                 MOV        DI,cur_pow_up_y_OFST
+	                 MOV_MEM    tempw1,[BX]
+	                 MOV_MEM    tempw2,[DI]
+	                 DrawImage  firepowerW, firepowerH, firepower, tempw1,tempw2
+	                 mov        BOOL_fire_power,1
+	                 JMP        TASKS
+	LBL5:            
+	TASKS:           
 	                 CALL       CONTINUE_TASKS
 	                 JMP        Forever
 MAIN ENDP
