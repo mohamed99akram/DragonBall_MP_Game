@@ -96,10 +96,10 @@ include drawing.inc
 	;calculate ending using the code: x+22, y+22
 
 	;states array
-	pow_up_state_array  db      0,0,0,0,0,0,0,0,0,0,0
+	pow_up_state_array  dw      0,0,0,0,0,0,0,0,0,0,0
 
 	powerup_counter     dw      0                                          	; AFTER A NUMBER OF LOOPS, A NEW POWERUP SHOULD APPEAR
-	powerup_rate        equ     1000
+	powerup_rate        equ     2000
 	cur_pow_up_x_OFST   dw      0
 	cur_pow_up_y_OFST   dw      0                                          	;BOTH INCREASE EVERY UPDATE TO POINT TO ARRAY ELEMENT
 	
@@ -119,6 +119,11 @@ include drawing.inc
 	POW_UP_TO_MAKE      DB      State_heart
 	; State_cola        EQU      4
 	; State_cake        EQU      5
+
+	HEART_HEALTH        EQU     10
+	COIN_HEALTH         EQU     5
+	FIRE_HEALTH         EQU     15                                         	; WILL BE CHANGED MAYBE TO NEGATIVE OR MAYBE FIREUP WILL ENABLE HIM FIRE BALL
+
 .CODE
 MAIN PROC FAR
 	                 mov                ax, @data
@@ -127,6 +132,7 @@ MAIN PROC FAR
 	                 mov                bx, 0100h                                                   	; 640x400 screen graphics mode
 	                 INT                10h                                                         	;execute the configuration
 	;ClearImage 640,400,0,0
+	;  CALL               FIRE_ME2
 	                 ClearImage         2,100,10,10
 	                 DrawImage          standingW, standingH, standing, P1_CUR_X, P2_CUR_Y
 	                 DrawImage          standing2W, standing2H, standing2, P2_CUR_X,P2_CUR_Y
@@ -135,7 +141,7 @@ MAIN PROC FAR
 	;POWER UP INITIALIZATION
 	                 MOV_MEM            cur_pow_up_x_OFST,OFFSET powerup_x
 	                 MOV_MEM            cur_pow_up_y_OFST,OFFSET powerup_y
-
+	                 
 	;draw health bar
 	                 ClearImage_Colored P1_HEALTH,10,30,30,15                                       	;white
 	                 ClearImage_Colored P2_HEALTH,10,400,30,15                                      	;white
@@ -290,8 +296,7 @@ MAIN PROC FAR
 	                 sub                P2_HEALTH, 5
 	                 cmp                P2_HEALTH,0
 	                 jle                lose0
-	                 ClearImage_Colored 100,10,400,30,0                                             	;black
-	                 ClearImage_Colored P2_HEALTH,10,400,30,15                                      	;white
+	                 CALL               P2_HEALTH_BAR                                               	;white
 	lose0:           
 	                 jmp                END_OF_INPUT
 		
@@ -320,8 +325,7 @@ MAIN PROC FAR
 	                 sub                P1_HEALTH, 5
 	                 cmp                P1_HEALTH,0
 	                 jle                lose1
-	                 ClearImage_Colored 100,10,30,30,0                                              	;black
-	                 ClearImage_Colored P1_HEALTH,10,30,30,15
+	                 CALL               P1_HEALTH_BAR
 	lose1:           
 	                 jmp                END_OF_INPUT
 
@@ -348,8 +352,7 @@ MAIN PROC FAR
 	                 sub                P2_HEALTH, 5
 	                 cmp                P2_HEALTH,0
 	                 jle                lose2
-	                 ClearImage_Colored 100,10,400,30,0                                             	;black
-	                 ClearImage_Colored P2_HEALTH,10,400,30,15
+	                 CALL               P2_HEALTH_BAR
 	lose2:           
 	                 jmp                END_OF_INPUT
 		
@@ -379,8 +382,7 @@ MAIN PROC FAR
 	                 sub                P1_HEALTH, 5
 	                 cmp                P1_HEALTH,0
 	                 jle                lose3
-	                 ClearImage_Colored 100,10,30,30,0                                              	;black
-	                 ClearImage_Colored P1_HEALTH,10,30,30,15
+	                 CALL               P1_HEALTH_BAR
 	lose3:           
 	                 jmp                END_OF_INPUT
 
@@ -458,64 +460,64 @@ MAIN PROC FAR
 
 	END_OF_INPUT:    
 	;draw POWER UPS
-	                 INC                powerup_counter
-	                 CMP                powerup_counter,powerup_rate
-	                 JNZ                TASKS
+	;                  INC                powerup_counter
+	;                  CMP                powerup_counter,powerup_rate
+	;                  JNZ                TASKS
 					
-	                 MOV                powerup_counter,0
-	                 INC                POW_UP_TO_MAKE
-	                 CMP                POW_UP_TO_MAKE,POWERUPS_STATES_NUM
-	                 JNZ                LBL1
-	                 MOV                POW_UP_TO_MAKE,1
-	LBL1:            
-	                 ADD                cur_pow_up_x_OFST,2
-	                 ADD                cur_pow_up_y_OFST,2
-	                 MOV                AX,OFFSET powerup_y
-	                 CMP                cur_pow_up_x_OFST,AX
-	                 JNE                LBL2
-	                 MOV_MEM            cur_pow_up_x_OFST,OFFSET powerup_x
-	                 MOV_MEM            cur_pow_up_y_OFST,OFFSET powerup_y
+	;                  MOV                powerup_counter,0
+	;                  INC                POW_UP_TO_MAKE
+	;                  CMP                POW_UP_TO_MAKE,POWERUPS_STATES_NUM
+	;                  JNZ                LBL1
+	;                  MOV                POW_UP_TO_MAKE,1
+	; LBL1:            
+	;                  ADD                cur_pow_up_x_OFST,2
+	;                  ADD                cur_pow_up_y_OFST,2
+	;                  MOV                AX,OFFSET powerup_y
+	;                  CMP                cur_pow_up_x_OFST,AX
+	;                  JNE                LBL2
+	;                  MOV_MEM            cur_pow_up_x_OFST,OFFSET powerup_x
+	;                  MOV_MEM            cur_pow_up_y_OFST,OFFSET powerup_y
 
-	LBL2:            
-	                 CMP                POW_UP_TO_MAKE,State_heart
-	                 JNZ                LBL3
-	                 MOV                BX,cur_pow_up_x_OFST
-	                 MOV                DI,cur_pow_up_y_OFST
-	                 MOV_MEM            tempw1,[BX]
-	                 MOV_MEM            tempw2,[DI]
-	                 DrawImage          heartW, heartH, heart, tempw1,tempw2
-	                 mov                BOOL_heart,1
-	                 sub                bx,offset powerup_x
-	                 add                bx, offset pow_up_state_array                               	; to edit state of current position
-	                 MOV_MEM            [bx],State_heart
-	                 JMP                TASKS
-	LBL3:            
-	                 CMP                POW_UP_TO_MAKE,State_coin
-	                 JNZ                LBL4
-	                 MOV                BX,cur_pow_up_x_OFST
-	                 MOV                DI,cur_pow_up_y_OFST
-	                 MOV_MEM            tempw1,[BX]
-	                 MOV_MEM            tempw2,[DI]
-	                 DrawImage          coinW, coinH, coin, tempw1,tempw2
-	                 mov                BOOL_coin,1
-	                 sub                bx,offset powerup_x
-	                 add                bx, offset pow_up_state_array                               	; to edit state of current position
-	                 MOV_MEM            [bx],State_coin
-	                 JMP                TASKS
-	LBL4:            
-	                 CMP                POW_UP_TO_MAKE,State_fire_power
-	                 JNZ                LBL5
-	                 MOV                BX,cur_pow_up_x_OFST
-	                 MOV                DI,cur_pow_up_y_OFST
-	                 MOV_MEM            tempw1,[BX]
-	                 MOV_MEM            tempw2,[DI]
-	                 DrawImage          firepowerW, firepowerH, firepower, tempw1,tempw2
-	                 mov                BOOL_fire_power,1
-	                 sub                bx,offset powerup_x
-	                 add                bx, offset pow_up_state_array                               	; to edit state of current position
-	                 MOV_MEM            [bx],State_fire_power
-	                 JMP                TASKS
-	LBL5:            
+	; LBL2:            
+	;                  CMP                POW_UP_TO_MAKE,State_heart
+	;                  JNZ                LBL3
+	;                  MOV                BX,cur_pow_up_x_OFST
+	;                  MOV                DI,cur_pow_up_y_OFST
+	;                  MOV_MEM            tempw1,[BX]
+	;                  MOV_MEM            tempw2,[DI]
+	;                  DrawImage          heartW, heartH, heart, tempw1,tempw2
+	;                  mov                BOOL_heart,1
+	;                  sub                bx,offset powerup_x
+	;                  add                bx, offset pow_up_state_array                               	; to edit state of current position
+	;                  MOV_MEM            [bx],State_heart
+	;                  JMP                TASKS
+	; LBL3:            
+	;                  CMP                POW_UP_TO_MAKE,State_coin
+	;                  JNZ                LBL4
+	;                  MOV                BX,cur_pow_up_x_OFST
+	;                  MOV                DI,cur_pow_up_y_OFST
+	;                  MOV_MEM            tempw1,[BX]
+	;                  MOV_MEM            tempw2,[DI]
+	;                  DrawImage          coinW, coinH, coin, tempw1,tempw2
+	;                  mov                BOOL_coin,1
+	;                  sub                bx,offset powerup_x
+	;                  add                bx, offset pow_up_state_array                               	; to edit state of current position
+	;                  MOV_MEM            [bx],State_coin
+	;                  JMP                TASKS
+	; LBL4:            
+	;                  CMP                POW_UP_TO_MAKE,State_fire_power
+	;                  JNZ                LBL5
+	;                  MOV                BX,cur_pow_up_x_OFST
+	;                  MOV                DI,cur_pow_up_y_OFST
+	;                  MOV_MEM            tempw1,[BX]
+	;                  MOV_MEM            tempw2,[DI]
+	;                  DrawImage          firepowerW, firepowerH, firepower, tempw1,tempw2
+	;                  mov                BOOL_fire_power,1
+	;                  sub                bx,offset powerup_x
+	;                  add                bx, offset pow_up_state_array                               	; to edit state of current position
+	;                  MOV_MEM            [bx],State_fire_power
+	;                  JMP                TASKS
+	; LBL5:            
 	TASKS:           
 	                 CALL               CONTINUE_TASKS
 	                 JMP                Forever
@@ -755,8 +757,7 @@ UpdateBall1 PROC
 	                 sub                P2_HEALTH, 10
 	                 cmp                P2_HEALTH,0
 	                 jle                lose4
-	                 ClearImage_Colored 100,10,400,30,0                                             	;black
-	                 ClearImage_Colored P2_HEALTH,10,400,30,15
+	                 CALL               P2_HEALTH_BAR
 	lose4:           
 	                 jmp                ClearBall
 	continue:        
@@ -810,8 +811,7 @@ UpdateBall2 PROC
 	                 sub                P1_HEALTH,10
 	                 cmp                P1_HEALTH,0
 	                 jle                lose5
-	                 ClearImage_Colored 100,10,30,30,0                                              	;black
-	                 ClearImage_Colored P1_HEALTH,10,30,30,15
+	                 CALL               P1_HEALTH_BAR
 	lose5:           
 	                 jmp                ClearBall
 
@@ -860,6 +860,43 @@ UpdateP2Left PROC
 
 	                 DrawImage          moving2W, moving2H, moving2, P2_CUR_X,P2_CUR_Y
 	                 CalcDimensions     P2_CUR_X,P2_CUR_Y,moving2W, moving2H, P2_END_X, P2_END_Y
+	;UPDATE POWER UPS
+	;                  MOV                tempw1,0
+	;                  MOV                BX,OFFSET powerup_x
+	;                  MOV                DI,OFFSET pow_up_state_array
+	; NEXT_POW_UP:     
+	;                  MOV                CX,[BX]                                                     	;START
+	;                  MOV                DX,CX
+	;                  ADD                DX,coinW                                                    	;END
+	;                  CMP                P2_CUR_X,DX
+	;                  JL                 LL0
+	;                  CMP                P2_CUR_X,CX
+	;                  JA                 LL0
+	; ;P2_x LESS THAN START AND GREATER THAN END -> ADD POWERUP VALUE TO HIS HEALTH
+	;                  CMP                [DI+tempw1],State_heart
+	;                  JNZ                NXT0
+	;                  ADD                P2_HEALTH,HEART_HEALTH
+	;                  call               P2_HEALTH_BAR
+	;                  ;CALL               FIRE_ME2
+	;                  mov                [di+tempw1],State_no_powerup
+	;                  JMP                LOUT0
+	; NXT0:            
+	;                  CMP                [DI+tempw1],State_coin
+	;                  JNZ                NXT1
+
+	; NXT1:            
+	;                  CMP                [DI+tempw1],State_Fire
+	;                  JNZ                NXT2
+
+	; NXT2:            
+	; LL0:             
+	;                  ADD                BX,2
+	;                  ADD                tempw1,2
+	;                  ;ADD                DI,2
+	;                  CMP                BX,powerup_y
+	;                  JZ                 LOUT0
+	;                  JMP                NEXT_POW_UP
+	; LOUT0:           
 	                 RET
 
 	endfunc:         
@@ -1102,8 +1139,25 @@ CalculateFactor PROC
 	L11:             
 	                 RET
 CalculateFactor ENDP
+FIRE_ME2 PROC
+	                 MOV_MEM            tempw1,P2_CUR_Y
+	                 sub                tempw1,12
+	                 DrawImage          powerup2W,powerup2H,powerup2,P2_CUR_X,tempw1
+	                 CALL               big_delay
+	                 ClearImage         powerup2W,powerup2H,P2_CUR_X,tempw1
 
-
+	                 RET
+FIRE_ME2 ENDP
+P1_HEALTH_BAR PROC
+	                 ClearImage_Colored 100,10,30,30,0                                              	;black
+	                 ClearImage_Colored P1_HEALTH,10,30,30,15
+	                 RET
+P1_HEALTH_BAR ENDP
+P2_HEALTH_BAR PROC
+	                 ClearImage_Colored 100,10,400,30,0                                             	;black
+	                 ClearImage_Colored P2_HEALTH,10,400,30,15
+	                 RET
+P2_HEALTH_BAR ENDP
 delay PROC
 	                 MOV                CX, 0000H
 	                 MOV                DX, 05DCH
@@ -1112,7 +1166,7 @@ delay PROC
 	                 RET
 delay ENDP
 big_delay proc
-	                 MOV                CX, 0000H
+	                 MOV                CX, 000fH
 	                 MOV                DX, 0ffDCH
 	                 MOV                AH, 86H
 	                 INT                15H

@@ -41,7 +41,7 @@ DrawImage MACRO imgW,imgH,img,startpositionX,startpositionY
 					 
 					;  call big_delay
 					;  nodelay:
-	                 ENDM           DrawImage
+ENDM           DrawImage
 
 ClearImage MACRO imgW,imgH,startpositionX,startpositionY
 	                 LOCAL          Drawitt
@@ -68,7 +68,7 @@ ClearImage MACRO imgW,imgH,startpositionX,startpositionY
 	                 JZ             ENDCLEARING                                                 	;  both x and y reached 00 so end program
 	                 Jmp            Drawitt
 	ENDCLEARING:     
-	                 ENDM           ClearImage
+ENDM           ClearImage
 
 CalcDimensions MACRO StartX,StartY,Width,Height,EndX,EndY
 	                 MOV_MEM        EndX, StartX
@@ -76,7 +76,7 @@ CalcDimensions MACRO StartX,StartY,Width,Height,EndX,EndY
 
 	                 MOV_MEM        EndY, StartY
 	                 ADD_MEM        EndY, Height
-	                 ENDM           CalcDimensions
+ENDM           CalcDimensions
 
 MOV_MEM MACRO MEMORY1,MEMORY2
 	                 PUSH           AX
