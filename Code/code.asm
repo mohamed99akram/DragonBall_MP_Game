@@ -238,7 +238,7 @@ include drawing.inc
 
 
 	powerup_x             dw      75,100,80,400,500,200,300,70,85,10,600
-	powerup_y             dw      11 dup(220);,150,150,150,150,150,150,150,150,150,150
+	powerup_y             dw      11 dup(220)                                                                   	;,150,150,150,150,150,150,150,150,150,150
 	;calculate ending using the code: x+22, y+22
 
 	;states array
@@ -271,7 +271,7 @@ include drawing.inc
 	FIRE_HEALTH           EQU     15                                                                            	; WILL BE CHANGED MAYBE TO NEGATIVE OR MAYBE FIREUP WILL ENABLE HIM FIRE BALL
 
 	COUNTER1              DW      0
-	COUNTER2 			DW 		0
+	COUNTER2              DW      0
 
 	BOOL_GAME_ENDED    db 0
 .CODE
@@ -281,7 +281,7 @@ MAIN PROC FAR
 
 
 
-    BEGINNING:
+	BEGINNING:          
 
 	;Display The MAIN_MENU Screen
 	                    MOV                AH,09                                                       	; INT Display String
@@ -603,7 +603,7 @@ MAIN PROC FAR
 	;ClearImage 640,400,0,0
 	;  CALL               FIRE_ME2
 	                    
-						MOV                BOOL_GAME_ENDED, 0
+	                    MOV                BOOL_GAME_ENDED, 0
 	                    MOV                P1_HEALTH,100
 	                    MOV                P2_HEALTH,100
 	                    MOV                P1_CUR_X, start1X
@@ -629,8 +629,8 @@ MAIN PROC FAR
 	;draw both players
 	Forever:            
 
-					    cmp BOOL_GAME_ENDED,1 
-						je BEGINNING
+	                    cmp                BOOL_GAME_ENDED,1
+	                    je                 BEGINNING
 						
 	                    MOV                AH,01H
 	                    INT                16H                                                         	;ZF = 1 IF NO INPUT
@@ -802,7 +802,7 @@ MAIN PROC FAR
 	                    jg                 END_OF_INPUT
 	;hit happened
 	                    sub                P1_HEALTH, 5
-	                    CALL               P1_HEALTH_BAR         
+	                    CALL               P1_HEALTH_BAR
 	                    jmp                END_OF_INPUT
 
 	kick1:              
@@ -826,7 +826,7 @@ MAIN PROC FAR
 	                    jg                 END_OF_INPUT
 	;hit happened
 	                    sub                P2_HEALTH, 5
-	                    CALL               P2_HEALTH_BAR            
+	                    CALL               P2_HEALTH_BAR
 	                    jmp                END_OF_INPUT
 		
 	kick2:              
@@ -1320,52 +1320,7 @@ UpdateP2Left PROC
 	                    CalcDimensions     P2_CUR_X,P2_CUR_Y,moving2W, moving2H, P2_END_X, P2_END_Y
 					 
 	;UPDATE POWER UPS
-	                    MOV                BX,0
-	                    MOV                DI,OFFSET powerup_x
-	NEXT_POW_UP:        
-	                    MOV                CX,powerup_x[BX]                                            	;START
-	                    MOV                DX,CX
-	                    ADD                DX,coinW                                                    	;END
-	                    CMP                P2_CUR_X,DX
-	                    JA                 LL0
-	                    CMP                P2_CUR_X,CX
-	                    JL                 LL0
-	;P2_x LESS THAN START AND GREATER THAN END -> ADD POWERUP VALUE TO HIS HEALTH
-	                    mov                ax,pow_up_state_array[BX]
-	                    CMP                ax,State_heart
-	                    JNZ                NXT0
-	                    ADD                P2_HEALTH,HEART_HEALTH
-	                    call               P2_HEALTH_BAR
-	                    CALL               FIRE_ME2
-	                    mov                pow_up_state_array[BX],State_no_powerup
-	                    JMP                LOUT0
-	NXT0:               
-	                    CMP                ax,State_coin
-	                    JNZ                NXT1
-	                    add                P2_HEALTH,COIN_HEALTH
-	                    call               P2_HEALTH_BAR
-	                    call               FIRE_ME2
-	                    mov                pow_up_state_array[BX],State_no_powerup
-	                    JMP                LOUT0
-	NXT1:               
-	                    CMP                ax,State_fire_power
-	                    JNZ                NXT2
-	                    add                P2_HEALTH,FIRE_HEALTH
-	                    call               P2_HEALTH_BAR
-	                    CALL               FIRE_ME2
-	                    mov                pow_up_state_array[BX],State_no_powerup
-	                    JMP                LOUT0
-
-	NXT2:               
-	                    jmp                LOUT0
-	LL0:                
-	                    ADD                BX,2
-	                    ADD                tempw1,2
-	                    ADD                DI,2
-	                    CMP                DI,offset powerup_y
-	                    JZ                 LOUT0
-	                    JMP                NEXT_POW_UP
-	LOUT0:              
+	                    Check_power_up     P2_CUR_X,2
 	                    RET
 
 	endfunc:            
@@ -1396,6 +1351,9 @@ UpdateP1Left PROC
 	                    sub                P1_CUR_X,ax
 	                    DrawImage          backW, backH, back, P1_CUR_X,P1_CUR_Y
 	                    CalcDimensions     P1_CUR_X,P1_CUR_Y,backW, backH, P1_END_X, P1_END_Y
+
+	;UPDATE POWER UPS
+	                    Check_power_up     P1_CUR_X,1
 	                    RET
 
 	endfunc:            
@@ -1425,6 +1383,8 @@ UpdateP2Right PROC
 	                    add                P2_CUR_X,ax
 	                    DrawImage          back2W, back2H, back2, P2_CUR_X,P2_CUR_Y
 	                    CalcDimensions     P2_CUR_X,P2_CUR_Y,backW, backH, P2_END_X, P2_END_Y
+	;UPDATE POWER UPS
+	                    Check_power_up     P2_END_X,2
 	                    RET
 
 	endfunc:            
@@ -1453,6 +1413,7 @@ UpdateP1Right PROC
 	                    add                P1_CUR_X,ax
 	                    DrawImage          movingW, movingH, moving, P1_CUR_X,P1_CUR_Y
 	                    CalcDimensions     P1_CUR_X,P1_CUR_Y,movingW, movingH, P1_END_X, P1_END_Y
+	                    Check_power_up     P1_END_X,1
 	                    RET
 
 	endfunc:            
@@ -1617,6 +1578,15 @@ FIRE_ME2 PROC
 
 	                    RET
 FIRE_ME2 ENDP
+FIRE_ME1 PROC
+	                    MOV_MEM            tempw1,P1_CUR_Y
+	                    sub                tempw1,12
+	                    DrawImage          powerupW,powerupH,powerup,P1_CUR_X,tempw1
+	                    CALL               big_delay
+	                    ClearImage         powerupW,powerupH,P1_CUR_X,tempw1
+
+	                    RET
+FIRE_ME1 ENDP
 P1_HEALTH_BAR PROC
 	                    mov                ax,P1_HEALTH
 	                    cmp                ax,100

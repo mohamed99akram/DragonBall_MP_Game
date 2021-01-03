@@ -120,8 +120,8 @@ ENDM           ClearImage_Colored
 
 
 DeclareWinner MACRO
-	local Player1Wins
-	local printwinner
+	                 local Player1Wins
+	                 local printwinner
 	                    mov                ah,0
 	                    mov                al,3
 	                    int                10h
@@ -190,3 +190,89 @@ DeclareWinner MACRO
 						mov BOOL_GAME_ENDED,1
 
 ENDM DeclareWinner 
+
+Check_power_up MACRO player_pos,PL
+	                 local NEXT_POW_UP2
+	                 local NXT0_2
+	                 local NXT1_2
+	                 local NXT2_2
+	                 local LL2
+	                 local LOUT2
+					 LOCAL P2_UPDATE0
+					 LOCAL END_UPDATE0
+					 LOCAL P2_UPDATE1
+					 LOCAL END_UPDATE1
+					 LOCAL P2_UPDATE2
+					 LOCAL END_UPDATE2
+						MOV				   SI,PL
+	                    MOV                BX,0
+	                    MOV                DI,OFFSET powerup_x
+	NEXT_POW_UP2:       
+	                    MOV                CX,powerup_x[BX]                                            	;START
+	                    MOV                DX,CX
+	                    ADD                DX,coinW                                                    	;END
+	                    CMP                player_pos,DX
+	                    JA                 LL2
+	                    CMP                player_pos,CX
+	                    JL                 LL2
+	;P2_x LESS THAN START AND GREATER THAN END -> ADD POWERUP VALUE TO HIS HEALTH
+	                    mov                ax,pow_up_state_array[BX]
+	                    CMP                ax,State_heart
+	                    JNZ                NXT0_2
+						CMP                SI,1
+						JNZ                P2_UPDATE0
+						ADD                P1_HEALTH,HEART_HEALTH
+	                    call               P1_HEALTH_BAR
+	                    CALL               FIRE_ME1
+						JMP                END_UPDATE0
+	P2_UPDATE0:
+	                    ADD                P2_HEALTH,HEART_HEALTH
+	                    call               P2_HEALTH_BAR
+	                    CALL               FIRE_ME2
+	END_UPDATE0:
+	                    mov                pow_up_state_array[BX],State_no_powerup
+	                    JMP                LOUT2
+	NXT0_2:             
+	                    CMP                ax,State_coin
+	                    JNZ                NXT1_2
+						CMP                SI,1
+						JNZ                P2_UPDATE1
+						ADD                P1_HEALTH,HEART_HEALTH
+	                    call               P1_HEALTH_BAR
+	                    CALL               FIRE_ME1
+						JMP                END_UPDATE1
+	P2_UPDATE1:
+	                    ADD                P2_HEALTH,HEART_HEALTH
+	                    call               P2_HEALTH_BAR
+	                    CALL               FIRE_ME2
+	END_UPDATE1:
+	                    mov                pow_up_state_array[BX],State_no_powerup
+	                    JMP                LOUT2
+	NXT1_2:             
+	                    CMP                ax,State_fire_power
+	                    JNZ                NXT2_2
+						CMP                SI,1
+						JNZ                P2_UPDATE2
+						ADD                P1_HEALTH,HEART_HEALTH
+	                    call               P1_HEALTH_BAR
+	                    CALL               FIRE_ME1
+						JMP                END_UPDATE2
+	P2_UPDATE2:
+	                    ADD                P2_HEALTH,HEART_HEALTH
+	                    call               P2_HEALTH_BAR
+	                    CALL               FIRE_ME2
+	END_UPDATE2:
+	                    mov                pow_up_state_array[BX],State_no_powerup
+	                    JMP                LOUT2
+
+	NXT2_2:             
+	                    jmp                LOUT2
+	LL2:                
+	                    ADD                BX,2
+	                    ADD                tempw1,2
+	                    ADD                DI,2
+	                    CMP                DI,offset powerup_y
+	                    JZ                 LOUT2
+	                    JMP                NEXT_POW_UP2
+	LOUT2:              
+ENDM Check_power_up
