@@ -236,6 +236,8 @@ include drawing.inc
 	tempw1                dw      ?
 	tempw2                dw      ?
 
+	P1                    EQU      1
+	P2                    EQU      2
 
 	powerup_x             dw      75,100,80,400,500,200,300,70,85,10,600
 	powerup_y             dw      11 dup(220)                                                                   	;,150,150,150,150,150,150,150,150,150,150
@@ -984,6 +986,8 @@ MAIN PROC FAR
 	                    JMP                TASKS
 	LBL5:               
 	TASKS:              
+						Check_power_up     P2
+						Check_power_up     P1
 	                    CALL               CONTINUE_TASKS
 	                    JMP                Forever
 	ENDPROGRAM:         
@@ -1318,9 +1322,6 @@ UpdateP2Left PROC
 
 	                    DrawImage          moving2W, moving2H, moving2, P2_CUR_X,P2_CUR_Y
 	                    CalcDimensions     P2_CUR_X,P2_CUR_Y,moving2W, moving2H, P2_END_X, P2_END_Y
-					 
-	;UPDATE POWER UPS
-	                    Check_power_up     P2_CUR_X,2
 	                    RET
 
 	endfunc:            
@@ -1352,8 +1353,6 @@ UpdateP1Left PROC
 	                    DrawImage          backW, backH, back, P1_CUR_X,P1_CUR_Y
 	                    CalcDimensions     P1_CUR_X,P1_CUR_Y,backW, backH, P1_END_X, P1_END_Y
 
-	;UPDATE POWER UPS
-	                    Check_power_up     P1_CUR_X,1
 	                    RET
 
 	endfunc:            
@@ -1383,8 +1382,7 @@ UpdateP2Right PROC
 	                    add                P2_CUR_X,ax
 	                    DrawImage          back2W, back2H, back2, P2_CUR_X,P2_CUR_Y
 	                    CalcDimensions     P2_CUR_X,P2_CUR_Y,backW, backH, P2_END_X, P2_END_Y
-	;UPDATE POWER UPS
-	                    Check_power_up     P2_END_X,2
+
 	                    RET
 
 	endfunc:            
@@ -1413,7 +1411,6 @@ UpdateP1Right PROC
 	                    add                P1_CUR_X,ax
 	                    DrawImage          movingW, movingH, moving, P1_CUR_X,P1_CUR_Y
 	                    CalcDimensions     P1_CUR_X,P1_CUR_Y,movingW, movingH, P1_END_X, P1_END_Y
-	                    Check_power_up     P1_END_X,1
 	                    RET
 
 	endfunc:            

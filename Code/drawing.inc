@@ -191,7 +191,7 @@ DeclareWinner MACRO
 
 ENDM DeclareWinner 
 
-Check_power_up MACRO player_pos,PL
+Check_power_up MACRO PL
 	                 local NEXT_POW_UP2
 	                 local NXT0_2
 	                 local NXT1_2
@@ -204,16 +204,35 @@ Check_power_up MACRO player_pos,PL
 					 LOCAL END_UPDATE1
 					 LOCAL P2_UPDATE2
 					 LOCAL END_UPDATE2
+					 LOCAL P2_MID
+					 LOCAL PMID_END
 						MOV				   SI,PL
+						;CALCULATE THE MIDDLE X OF THE PLAYER
+						CMP				   SI,1
+						JNZ				   P2_MID
+						MOV				   AX,P1_END_X
+						SUB				   AX,P1_CUR_X
+						MOV_MEM		   	   tempw2,P1_CUR_X
+						JMP				   PMID_END
+	P2_MID:
+						MOV				   AX,P2_END_X
+						SUB				   AX,P2_CUR_X
+						MOV_MEM		   	   tempw2,P2_CUR_X
+	PMID_END:
+						MOV				   DX,0
+						MOV				   CX,2
+						DIV				   CX
+						ADD				   AX,tempw2 ;NOW AX HAS THE MIDDLE OF THE PLAYER
+						MOV				   tempw2,AX
 	                    MOV                BX,0
 	                    MOV                DI,OFFSET powerup_x
 	NEXT_POW_UP2:       
 	                    MOV                CX,powerup_x[BX]                                            	;START
 	                    MOV                DX,CX
 	                    ADD                DX,coinW                                                    	;END
-	                    CMP                player_pos,DX
+	                    CMP                tempw2,DX
 	                    JA                 LL2
-	                    CMP                player_pos,CX
+	                    CMP                tempw2,CX
 	                    JL                 LL2
 	;P2_x LESS THAN START AND GREATER THAN END -> ADD POWERUP VALUE TO HIS HEALTH
 	                    mov                ax,pow_up_state_array[BX]
