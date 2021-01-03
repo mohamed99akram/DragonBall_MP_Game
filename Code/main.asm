@@ -236,8 +236,8 @@ include drawing.inc
 	tempw1                dw      ?
 	tempw2                dw      ?
 
-	P1                    EQU      1
-	P2                    EQU      2
+	P1                    EQU     1
+	P2                    EQU     2
 
 	powerup_x             dw      75,100,80,400,500,200,300,70,85,10,600
 	powerup_y             dw      11 dup(220)                                                                   	;,150,150,150,150,150,150,150,150,150,150
@@ -275,7 +275,10 @@ include drawing.inc
 	COUNTER1              DW      0
 	COUNTER2              DW      0
 
-	BOOL_GAME_ENDED    db 0
+	BOOL_GAME_ENDED       db      0
+	
+	tempvar               dw      0
+
 .CODE
 MAIN PROC FAR
 	                    mov                ax, @data
@@ -307,7 +310,7 @@ MAIN PROC FAR
 	                    INT                16H
 	                    CMP                AH,3CH                                                      	; Check IF Key = F2
 	                    JZ                 GAMEMODE
-	                    CMP                AL,1BH                                                      	; Check IF Key = ESC
+	                    CMP                Al,1BH                                                      	; Check IF Key = ESC
 	                    JZ                 ENDPRO
 	                    JMP                SELECT_MODE                                                 	; ELSE NOT F2 | ESC RETURN
 	GAMEMODE:           
@@ -315,7 +318,14 @@ MAIN PROC FAR
 	                    JMP                TO_DRAGON_BALL
 	ENDPRO:             
 	                    MOV                PROGRAM_MODE, 2                                             	; PROGRAM_MODE = ESC
-	                    JMP                ENDPROGRAM
+	                    MOV                AX, 0600H
+	                    MOV                BH, 7
+	                    MOV                CX, 0
+	                    MOV                DX ,184FH
+	                    INT                10H
+	                    mov                ah, 4ch
+	                    int                21h
+	                    int                20h
 
 	TO_DRAGON_BALL:     
        
@@ -613,6 +623,17 @@ MAIN PROC FAR
 	                    MOV                P1_CUR_Y, StartY
 	                    MOV                P2_CUR_Y, StartY
 
+
+	                    mov                tempvar,0
+	                    mov                cx,16
+	drawground:         
+	                    push               cx
+	                    DrawImage          groundW,groundH,ground,tempvar,250
+	                    add                tempvar,40
+	                    pop                cx
+	                    loop               drawground
+
+
 	                    DrawImage          standingW, standingH, standing, P1_CUR_X, P2_CUR_Y
 	                    DrawImage          standing2W, standing2H, standing2, P2_CUR_X,P2_CUR_Y
 	                    CalcDimensions     P1_CUR_X,P1_CUR_Y,standingW, standingH, P1_END_X, P1_END_Y
@@ -760,6 +781,7 @@ MAIN PROC FAR
 	                    mov                P1_state, State_Boxing
 	                    mov                P1_state_count, Boxing_Counting
 	                    ClearImage         standingW, standingH, P1_CUR_X, P1_CUR_Y
+	                    sub                P1_CUR_Y,2
 	                    DrawImage          boxingW, boxingH, boxing, P1_CUR_X,P1_CUR_Y
 	                    CalcDimensions     P1_CUR_X,P1_CUR_Y,boxingW, boxingH, P1_END_X, P1_END_Y
 
@@ -786,6 +808,7 @@ MAIN PROC FAR
 	                    mov                P2_state_count, Boxing_Counting
 	                    ClearImage         standing2W, standing2H, P2_CUR_X,P2_CUR_Y
 	                    sub                P2_CUR_X,P2_difference
+	                    sub                P2_CUR_Y,2
 	                    DrawImage          boxing2W, boxing2H, boxing2, P2_CUR_X,P2_CUR_Y
 	                    CalcDimensions     P2_CUR_X,P2_CUR_Y,boxing2W, boxing2H, P2_END_X, P2_END_Y
 
@@ -811,6 +834,7 @@ MAIN PROC FAR
 	                    mov                P1_state, State_Kicking
 	                    mov                P1_state_count, Kicking_Counting
 	                    ClearImage         standingW, standingH, P1_CUR_X,P1_CUR_Y
+	                    sub                P1_CUR_Y,5
 	                    DrawImage          kickingW, kickingH, kicking, P1_CUR_X,P1_CUR_Y
 	                    CalcDimensions     P1_CUR_X,P1_CUR_Y,kickingW, kickingH, P1_END_X, P1_END_Y
 	;Check if it hit player2
@@ -835,8 +859,8 @@ MAIN PROC FAR
 	                    mov                P2_state, State_Kicking
 	                    mov                P2_state_count, Kicking_Counting
 	                    ClearImage         standing2W, standing2H, P2_CUR_X,P2_CUR_Y
-	;  MOV_MEM        P2_Calculated_X, P2_CUR_X
-	;  sub            P2_Calculated_X, P2_difference
+
+	                    sub                P2_CUR_Y,5
 	                    sub                P2_CUR_X,P2_difference
 	                    DrawImage          kicking2W, kicking2H, kicking2, P2_CUR_X,P2_CUR_Y
 	                    CalcDimensions     P2_CUR_X,P2_CUR_Y,kicking2W, kicking2H, P2_END_X, P2_END_Y
@@ -986,11 +1010,12 @@ MAIN PROC FAR
 	                    JMP                TASKS
 	LBL5:               
 	TASKS:              
-						Check_power_up     P2
-						Check_power_up     P1
+	                    Check_power_up     P2
+	                    Check_power_up     P1
 	                    CALL               CONTINUE_TASKS
 	                    JMP                Forever
 	ENDPROGRAM:         
+	
 MAIN ENDP
 
 
@@ -1091,6 +1116,7 @@ UpdateP1Kicking PROC
 	                    cmp                P1_state_count, 0
 	                    jne                endfunc
 	                    ClearImage         kickingW, kickingH, P1_CUR_X,P1_CUR_Y
+	                    add                P1_CUR_Y,5
 	                    DrawImage          standingW, standingH, standing, P1_CUR_X,P1_CUR_Y
 	                    CalcDimensions     P1_CUR_X,P1_CUR_Y,standingW, standingH, P1_END_X, P1_END_Y
 	                    mov                P1_state, State_Standing
@@ -1103,6 +1129,7 @@ UpdateP1Boxing PROC
 	                    cmp                P1_state_count, 0
 	                    jne                endfunc
 	                    ClearImage         boxingW, boxingH, P1_CUR_X,P1_CUR_Y
+	                    add                P1_CUR_Y,2
 	                    DrawImage          standingW, standingH, standing, P1_CUR_X,P1_CUR_Y
 	                    CalcDimensions     P1_CUR_X,P1_CUR_Y,standingW, standingH, P1_END_X, P1_END_Y
 	                    mov                P1_state, State_Standing
@@ -1140,6 +1167,7 @@ UpdateP2Kicking PROC
 	                    jne                endfunc
 	                    ClearImage         kicking2W, kicking2H, P2_CUR_X,P2_CUR_Y
 	                    ADD                P2_CUR_X,P2_difference
+	                    add                P2_CUR_Y,5
 	                    DrawImage          standing2W, standing2H, standing2, P2_CUR_X,P2_CUR_Y
 	                    CalcDimensions     P2_CUR_X,P2_CUR_Y,standing2W, standing2H, P2_END_X, P2_END_Y
 	                    mov                P2_state, State_Standing
@@ -1153,6 +1181,7 @@ UpdateP2Boxing PROC
 	                    jne                endfunc
 	                    ClearImage         boxing2W, boxing2H,P2_CUR_X,P2_CUR_Y
 	                    ADD                P2_CUR_X,P2_difference
+	                    add                P2_CUR_Y,2
 	                    DrawImage          standing2W, standing2H, standing2, P2_CUR_X ,P2_CUR_Y
 	                    CalcDimensions     P2_CUR_X,P2_CUR_Y,standing2W, standing2H, P2_END_X, P2_END_Y
 	                    mov                P2_state, State_Standing
@@ -1568,7 +1597,7 @@ CalculateFactor PROC
 CalculateFactor ENDP
 FIRE_ME2 PROC
 	                    MOV_MEM            tempw1,P2_CUR_Y
-	                    sub                tempw1,12
+	                    sub                tempw1,15
 	                    DrawImage          powerup2W,powerup2H,powerup2,P2_CUR_X,tempw1
 	                    CALL               big_delay
 	                    ClearImage         powerup2W,powerup2H,P2_CUR_X,tempw1
@@ -1577,7 +1606,7 @@ FIRE_ME2 PROC
 FIRE_ME2 ENDP
 FIRE_ME1 PROC
 	                    MOV_MEM            tempw1,P1_CUR_Y
-	                    sub                tempw1,12
+	                    sub                tempw1,15
 	                    DrawImage          powerupW,powerupH,powerup,P1_CUR_X,tempw1
 	                    CALL               big_delay
 	                    ClearImage         powerupW,powerupH,P1_CUR_X,tempw1
@@ -1639,42 +1668,5 @@ big_delay proc
 	                    RET
 big_delay endp
 
-PRINT_AN_INPUT PROC
-	;SET CURSRO
-	                    PUSH               AX
-	                    PUSH               BX
-	                    PUSH               CX
-	                    PUSH               DX
-
-	                    PUSH               AX
-	                    MOV                AH,2
-	                    MOV                DH,10
-	                    MOV                DL,20
-	                    MOV                BH,0
-	                    INT                10H
-	                    POP                AX
-	                    MOV                CX,1
-	                    MOV                BH,0
-	                    MOV                DL,AL
-	                    MOV                DH,AH
-	                    MOV                AH,0AH
-	                    MOV                AL,DL
-	                    INT                10H
-	                    PUSH               DX
-	                    CALL               delay
-	                    POP                DX
-	                    MOV                BH,0
-	                    MOV                CX,1
-	                    MOV                DL,DH
-	                    MOV                AH,0AH
-	                    MOV                AL,DH
-	                    INT                10H
-
-	                    POP                AX
-	                    POP                BX
-	                    POP                CX
-	                    POP                DX
-	                    RET
-PRINT_AN_INPUT ENDP
 END MAIN
 
