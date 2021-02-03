@@ -40,10 +40,10 @@ include drawing.inc
 
 	PLAYER1_NAMEIN        DB      30,?,30 DUP('$')
 	PLAYER2_NAMEIN        DB      30,?,30 DUP('$')
-	PLAYER1_NAME          DB      7 DUP(?) ,'$'
-	PLAYER2_NAME          DB      7 DUP(?) ,'$'
-	PLAYER1_NAME_REVERSED DB      7 DUP(?) ,'$'
-	PLAYER2_NAME_REVERSED DB      7 DUP(?) ,'$'
+	PLAYER1_NAME          DB      15 DUP(?) ,'$'
+	PLAYER2_NAME          DB      15 DUP(?) ,'$'
+	PLAYER1_NAME_REVERSED DB      15 DUP(?) ,'$'
+	PLAYER2_NAME_REVERSED DB      15 DUP(?) ,'$'
 	GameScreen            DB      '  ',0ah,0dh
 	                      db      '                                                                    ',0ah,0dh
 	                      db      '                                                                    ',0ah,0dh
@@ -63,11 +63,11 @@ include drawing.inc
 	                      DB      '               |   Enter The Name OF The First Player Then Press   |',0ah,0dh
 	                      DB      '               |                      Enter                        |',0ah,0dh
 	                      DB      '               |                                                   |',0ah,0dh
-	                      DB      '               |   Enter The Name OF The First Player Then Press   |',0ah,0dh
-	                      DB      '               |         Then Press Enter TO Start The Game        |',0ah,0dh
+	                      DB      '               |     Enter The Name OF The Second Player Then	   |',0ah,0dh
+	                      DB      '               |        	 Press Enter TO Continue	   |',0ah,0dh
 	                      DB      '               |-------------------------------------------------- |',0ah,0dh
 	                      DB      '               |      Note: Player Name Must Not be Greater        |',0ah,0dh
-	                      DB      '               |            Than 7 Characters                      |',0ah,0dh
+	                      DB      '               |            Than 15 Characters                     |',0ah,0dh
 	                      DB      '               |___________________________________________________|',0ah,0dh
 	                      DB      '$',0ah,0dh
 
@@ -279,60 +279,15 @@ include drawing.inc
 	
 	tempvar               dw      0
 
-	CurPlayerNum db P1
-	OtherPlayerNum db P2
-
 .CODE
 MAIN PROC FAR
 	                    mov                ax, @data
 	                    mov                DS, ax
 
-	;;;PORTS INITALIZATION
-	PORTS
 
-	BEGINNING:          
 
-	;Display The MAIN_MENU Screen
-	                    MOV                AH,09                                                       	; INT Display String
-	                    MOV                DX,OFFSET MAIN_MENU                                         	; OFFset OF The Massage
-	                    INT                21H                                                         	;
+	BEGINNING:
 
-	; Out MAIN_MENU MESSAGE
-	; Set Cursor To Print LEVEL Message
-	                    MOV                DL, 15                                                      	; X Position
-	                    MOV                DH, 5                                                       	; Y Position
-	                    MOV                AH, 02h                                                     	; INT Set Cursor In Given Position
-	                    int                10h
-
-	;Print MAINMENU Message
-	                    MOV                AH,09                                                       	; INT Display String
-	                    MOV                DX, OFFSET  MAINMENU_Message                                	;OFFset OF The Massage
-	                    INT                21H
-
-	SELECT_MODE:                                                                                       	; USED TO SET MODE OF PROGRAM
-	                    MOV                AH,0                                                        	; INT Get key pressed & Wait for a key
-	                    INT                16H
-	                    CMP                AH,3CH                                                      	; Check IF Key = F2
-	                    JZ                 GAMEMODE
-	                    CMP                Al,1BH                                                      	; Check IF Key = ESC
-	                    JZ                 ENDPRO
-	                    JMP                SELECT_MODE                                                 	; ELSE NOT F2 | ESC RETURN
-	GAMEMODE:           
-	                    MOV                PROGRAM_MODE, 1                                             	; PROGRAM_MODE = F2
-	                    JMP                TO_DRAGON_BALL
-	ENDPRO:             
-	                    MOV                PROGRAM_MODE, 2                                             	; PROGRAM_MODE = ESC
-	                    MOV                AX, 0600H
-	                    MOV                BH, 7
-	                    MOV                CX, 0
-	                    MOV                DX ,184FH
-	                    INT                10H
-	                    mov                ah, 4ch
-	                    int                21h
-	                    int                20h
-
-	TO_DRAGON_BALL:     
-       
 	;Display The Game Screen
 	                    MOV                AH,09                                                       	; INT Display String
 	                    MOV                DX,OFFSET GameScreen                                        	; OFFset OF The Massage
@@ -390,7 +345,7 @@ MAIN PROC FAR
 	                    INT                21H
              
 
-	; FIX PLAYER1 NAME -> 7 CHARACTERS
+	; FIX PLAYER1 NAME -> 15 CHARACTERS
 	                    MOV                BX,0                                                        	; COUNTER
         
 	                    mov                DI, OFFSET [ PLAYER1_NAMEIN + 1 ]                           	; GET SIZE OF PLAYER1 NAME
@@ -400,11 +355,11 @@ MAIN PROC FAR
 	                    MOV                SI , OFFSET PLAYER1_NAMEIN + 2                              	; INPUT PLAYER1_NAME START FROM 3
 	                    MOV                DI , OFFSET PLAYER1_NAME                                    	; REAL PLAYER1_NAME (7 CHARACTERS)
         
-	                    CMP                CX , 7                                                      	; CHECK IF SIZE > 7 SET IT WITH 7
-	                    JNC                SETSIZEX                                                    	; JMP TO SET CX = 7
+	                    CMP                CX , 0FH                                                      	; CHECK IF SIZE > 15 SET IT WITH 15
+	                    JNC                SETSIZEX                                                    	; JMP TO SET CX = 15
 	                    JMP                FIXNAME1                                                    	; ELSE JMP TO DRAW PLAYER1 NAME
 	SETSIZEX:           
-	                    MOV                CX,7H                                                       	;SET CX = 7
+	                    MOV                CX,0FH                                                       	;SET CX = 15
     
 	FIXNAME1:                                                                                          	; LOOP USED TO COPY FIRST 7 CHARACTER FROM SI TO DI
 	                    MOV                DL , [BX][SI]
@@ -413,7 +368,7 @@ MAIN PROC FAR
           
 	                    LOOP               FIXNAME1
 
-	; FIX PLAYER2 NAME -> 7 CHARACTERS
+	; FIX PLAYER2 NAME -> 15 CHARACTERS
 	                    MOV                BX,0                                                        	; COUNTER
         
 	                    mov                DI, OFFSET [ PLAYER2_NAMEIN + 1 ]                           	; GET SIZE OF PLAYER1 NAME
@@ -423,20 +378,62 @@ MAIN PROC FAR
 	                    MOV                SI , OFFSET PLAYER2_NAMEIN + 2                              	; INPUT PLAYER1_NAME START FROM 3
 	                    MOV                DI , OFFSET PLAYER2_NAME                                    	; REAL PLAYER1_NAME (7 CHARACTERS)
         
-	                    CMP                CX , 7                                                      	; CHECK IF SIZE > 7 SET IT WITH 7
-	                    JNC                SETSIZEX2                                                   	; JMP TO SET CX = 7
+	                    CMP                CX , 0FH                                                      	; CHECK IF SIZE > 15 SET IT WITH 15
+	                    JNC                SETSIZEX2                                                   	; JMP TO SET CX = 15
 	                    JMP                FIXNAME2                                                    	; ELSE JMP TO DRAW PLAYER1 NAME
-	SETSIZEX2:                                                                                         	; SET CX = 7
-	                    MOV                CX,7H
+	SETSIZEX2:                                                                                         	; SET CX = 15
+	                    MOV                CX,0FH
 
 	FIXNAME2:                                                                                          	; LOOP USED TO COPY FIRST 7 CHARACTER FROM SI TO DI
 	                    MOV                DL , [BX][SI]
 	                    MOV                [BX][DI] , DL
 	                    ADD                BX,1
     
-	                    LOOP               FIXNAME2
-    
-      
+	                    LOOP               FIXNAME2          
+
+
+	
+	SELECT_MODE: 
+	;Display The MAIN_MENU Screen
+	                    MOV                AH,09                                                       	; INT Display String
+	                    MOV                DX,OFFSET MAIN_MENU                                         	; OFFset OF The Massage
+	                    INT                21H                                                         	;
+
+	; Out MAIN_MENU MESSAGE
+	; Set Cursor To Print LEVEL Message
+	                    MOV                DL, 15                                                      	; X Position
+	                    MOV                DH, 5                                                       	; Y Position
+	                    MOV                AH, 02h                                                     	; INT Set Cursor In Given Position
+	                    int                10h
+
+	;Print MAINMENU Message
+	                    MOV                AH,09                                                       	; INT Display String
+	                    MOV                DX, OFFSET  MAINMENU_Message                                	;OFFset OF The Massage
+	                    INT                21H
+                                                                                      	; USED TO SET MODE OF PROGRAM
+	                    MOV                AH,0                                                        	; INT Get key pressed & Wait for a key
+	                    INT                16H
+	                    CMP                AH,3CH                                                      	; Check IF Key = F2
+	                    JZ                 GAMEMODE
+	                    CMP                Al,1BH                                                      	; Check IF Key = ESC
+	                    JZ                 ENDPRO
+	                    JMP                SELECT_MODE                                                 	; ELSE NOT F2 | ESC RETURN
+	GAMEMODE:           
+	                    MOV                PROGRAM_MODE, 1                                             	; PROGRAM_MODE = F2
+	                    JMP                TO_DRAGON_BALL
+	ENDPRO:             
+	                    MOV                PROGRAM_MODE, 2                                             	; PROGRAM_MODE = ESC
+	                    MOV                AX, 0600H
+	                    MOV                BH, 7
+	                    MOV                CX, 0
+	                    MOV                DX ,184FH
+	                    INT                10H
+	                    mov                ah, 4ch
+	                    int                21h
+	                    int                20h
+
+	TO_DRAGON_BALL:     
+       
 	;Display The SELECT LEVEL Screen
 	                    MOV                AH,09                                                       	; INT Display String
 	                    MOV                DX,OFFSET LevelScreen                                       	; OFFset OF The Massage
@@ -511,7 +508,7 @@ MAIN PROC FAR
  
 
 	; REVERSE PLAYER1 NAME
-	                    MOV                SI , OFFSET PLAYER1_NAME+6                                  	; OFFSET OF LAST CHARACTER
+	                    MOV                SI , OFFSET PLAYER1_NAME+14                                  	; OFFSET OF LAST CHARACTER
 	                    MOV                DI , OFFSET PLAYER1_NAME_REVERSED                           	; OFFSET OF REVERSED NAME
 	                    MOV                DX,0                                                        	; COUNTER
     
@@ -521,11 +518,11 @@ MAIN PROC FAR
 	                    DEC                SI                                                          	; DECREASE SI
 	                    INC                DX                                                          	; INCREASE COUNTER
 	                    INC                DI                                                          	; INCREASE SI
-	                    CMP                DX , 7                                                      	; CHECK IF COUNTER = 7
+	                    CMP                DX , 0FH                                                    	; CHECK IF COUNTER = 15
 	                    JNZ                REVERSE1                                                    	; IF NOT LOOP
 
 	; REVERSE PLAYER2 NAME
-	                    MOV                SI , OFFSET PLAYER2_NAME+6                                  	; OFFSET OF LAST CHARACTER
+	                    MOV                SI , OFFSET PLAYER2_NAME+14                                  	; OFFSET OF LAST CHARACTER
 	                    MOV                DI , OFFSET PLAYER2_NAME_REVERSED                           	; OFFSET OF REVERSED NAME
 	                    MOV                DX,0                                                        	; COUNTER
     
@@ -535,12 +532,12 @@ MAIN PROC FAR
 	                    DEC                SI                                                          	; DECREASE SI
 	                    INC                DX                                                          	; INCREASE COUNTER
 	                    INC                DI                                                          	; INCREASE SI
-	                    CMP                DX , 7                                                      	; CHECK IF COUNTER = 7
+	                    CMP                DX , 0FH                                                      	; CHECK IF COUNTER = 15
 	                    JNZ                REVERSE2                                                    	; IF NOT LOOP
 
 	; WRITE PLAYER 1 NAME IN HEALTH BAR
 	;moving the cursor
-	                    mov                dl,10                                                       	; X POSITION
+	                    mov                dl,6                                                       	; X POSITION
 	                    mov                dh,1                                                        	; Y POSITION
 	                    mov                ah,02h                                                      	; INT Move Cursor to X,Y Position
 	                    int                10h
@@ -550,7 +547,7 @@ MAIN PROC FAR
 	                    mov                ah,9                                                        	; INT USED TO Display a letter number of times
 	                    MOV                BH,0                                                        	; PAGE NUMBER
 	                    mov                si,0                                                        	; COUNTER
-	                    MOV                CX , 7H
+	                    MOV                CX , 0FH
 	                    MOV                CH , 0H
 	DrawPLayer1Name:    
 	;display the name
@@ -558,11 +555,11 @@ MAIN PROC FAR
 	                    int                10h
 	                    INC                si                                                          	; INCREASE COUNTER
 	                    DEC                CX
-	                    JNZ                DrawPLayer1Name                                             	; LOOP 7 TIMES
+	                    JNZ                DrawPLayer1Name                                             	; LOOP 15 TIMES
               
 	; WRITE PLAYER 2 NAME IN HEALTH BAR
 	;moving the cursor
-	                    mov                dl,63                                                       	; X POSITION
+	                    mov                dl,59                                                       	; X POSITION
 	                    mov                dh,1                                                        	; Y POSITION
 	                    mov                ah,02h                                                      	; INT Move Cursor to X,Y Position
 	                    int                10h
@@ -573,17 +570,17 @@ MAIN PROC FAR
 	                    MOV                BH,0                                                        	; PAGE NUMBER
 	                    mov                si,0                                                        	; COUNTER
 
-	                    MOV                CX , 7
+	                    MOV                CX , 0FH
 	                    MOV                CH,0
 	DrawPLayer2Name:    
 	;display the name
 	                    mov                al,[PLAYER2_NAME_REVERSED+si]                               	; MOVE NAME LETTER BY LETTER
 	                    int                10h
 	                    INC                si                                                          	; INCREASE COUNTER
-	                    CMP                SI , 7
+	                    CMP                SI , 0FH
 	                    JZ                 DrawPLayer2NameEXIT
 	                    DEC                CX
-	                    JNZ                DrawPLayer2Name                                             	; LOOP 7 TIMES
+	                    JNZ                DrawPLayer2Name                                             	; LOOP 15 TIMES
 	DrawPLayer2NameEXIT:
         
 	; WRITE HEALTH WORD IN HEALTH BAR
@@ -657,7 +654,7 @@ MAIN PROC FAR
 	Forever:            
 
 	                    cmp                BOOL_GAME_ENDED,1
-	                    je                 BEGINNING
+	                    je                 SELECT_MODE
 						
 	                    MOV                AH,01H
 	                    INT                16H                                                         	;ZF = 1 IF NO INPUT
@@ -1747,7 +1744,6 @@ big_delay proc
 	                    INT                15H
 	                    RET
 big_delay endp
-
 
 END MAIN
 

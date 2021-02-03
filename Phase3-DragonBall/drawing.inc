@@ -69,7 +69,12 @@ MOV_MEM MACRO MEMORY1,MEMORY2
 	                 MOV            AX,MEMORY2
 	                 MOV            MEMORY1,AX
 	                 POP            AX
-	                 ENDM           MOV_MEM
+ENDM           MOV_MEM
+
+MOV_BYTE_MEM MACRO MEMORY1,MEMORY2
+	                 MOV            Al,MEMORY2
+	                 MOV            MEMORY1,Al
+ENDM           MOV_BYTE_MEM
 
 ADD_MEM MACRO MEMORY1,MEMORY2
 	                 PUSH           AX
@@ -121,9 +126,10 @@ DeclareWinner MACRO
 	                    INT                21H                                                         	;
 
 	                    
-
-	                    mov                ax,P1_HEALTH
-	                    mov                bx,P2_HEALTH
+						mov al,P1_HEALTH
+						mov ah,0
+						mov bl,P2_HEALTH
+						mov bh,0
 
 	                    cmp                ax,bx
 	                    jg                 Player1Wins
@@ -242,12 +248,12 @@ Check_power_up MACRO PL
 	                    JNZ                NXT1_2
 						CMP                SI,1
 						JNZ                P2_UPDATE1
-						ADD                P1_HEALTH,HEART_HEALTH
+						ADD                P1_HEALTH,COIN_HEALTH
 	                    call               P1_HEALTH_BAR
 	                    CALL               FIRE_ME1
 						JMP                END_UPDATE1
 	P2_UPDATE1:
-	                    ADD                P2_HEALTH,HEART_HEALTH
+	                    ADD                P2_HEALTH,COIN_HEALTH
 	                    call               P2_HEALTH_BAR
 	                    CALL               FIRE_ME2
 	END_UPDATE1:
@@ -258,13 +264,11 @@ Check_power_up MACRO PL
 	                    JNZ                NXT2_2
 						CMP                SI,1
 						JNZ                P2_UPDATE2
-						ADD                P1_HEALTH,HEART_HEALTH
-	                    call               P1_HEALTH_BAR
+						mov 				BOOL_P1FirePower,1
 	                    CALL               FIRE_ME1
 						JMP                END_UPDATE2
 	P2_UPDATE2:
-	                    ADD                P2_HEALTH,HEART_HEALTH
-	                    call               P2_HEALTH_BAR
+						mov 				BOOL_P2FirePower,1	
 	                    CALL               FIRE_ME2
 	END_UPDATE2:
 	                    mov                pow_up_state_array[BX],State_no_powerup
@@ -304,3 +308,155 @@ PORTS MACRO
 	      mov  al,00011011b
 	      out  dx,al
 ENDM PORTS
+
+SetCursorAt MACRO x,y
+	      MOV  DL,x
+		  MOV  DH,y
+	      MOV  AH,2
+	      MOV  BH,0
+	      INT  10H
+ENDM SetCursorAt
+
+WriteChar MACRO char
+		  SetCursorAt 0,0
+	      MOV  AH,2
+	      MOV  DL,char
+	      INT  21H
+ENDM WriteChar
+
+
+advance_cursor1 MACRO
+	local OK
+	LOCAL CMPROW
+	mov dx,CURSOR1
+
+	inc dl
+	CMP dl,35
+	jL CMPROW
+	MOV DL,0
+	INC DH
+CMPROW:
+	cmp dh,25
+	JL OK
+	; PUSH DX
+	; mov ah,6 ; function 6
+	; mov al,1 ; scroll by 1 line (al=0 change color)
+	; mov bh,7 ; normal video attribute
+	; mov ch,20 ; upper left Y
+	; mov cl,0 ; upper left X
+	; mov dh,23 ; lower right Y
+	; mov dl,35 ; lower right X
+	; int 10h
+	; POP DX
+	ClearImage_Colored 300,80,0,320,LIGHT_cyan	
+	MOV DX,1400h
+OK:
+	MOV CURSOR1,DX
+ENDM advance_cursor1
+
+advance_cursor2 MACRO
+	local OK
+	LOCAL CMPROW
+	mov dx,CURSOR2
+
+	inc dl
+	CMP dl,79
+	jL CMPROW
+	MOV DL,39
+	INC DH
+CMPROW:
+	cmp dh,25
+	JL OK
+	; PUSH DX
+	; mov ah,6 ; function 6
+	; mov al,1 ; scroll by 1 line (al=0 change color)
+	; mov bh,7 ; normal video attribute
+	; mov ch,20 ; upper left Y
+	; mov cl,36 ; upper left X
+	; mov dh,23 ; lower right Y
+	; mov dl,79 ; lower right X
+	; int 10h
+	; POP DX
+	ClearImage_Colored 340,80,300,320,LIGHT_cyan
+	MOV DX,1427h
+OK:
+	MOV CURSOR2,DX
+ENDM advance_cursor2
+
+
+
+in_game_chat MACRO 
+	Local AGAIN
+	Local CHK
+	local END_CHAT
+	LOCAL NXTT
+	AGAIN:
+	;######TRANSMIT DATA#####
+	;SET CURSOR
+	      MOV  DX,CURSOR1
+	      MOV  AH,2
+	      MOV  BH,0
+	      INT  10H
+
+	;READ DATA
+	      MOV  AH,1
+	      INT  16H
+	      JZ   CHK
+	      MOV  VAL,al
+	;WRITE WHAT YOU READ
+	;$$
+	;CHECK TRANSMITION
+	      mov  dx , 3FDH     	; Line Status Register
+	      In   al , dx       	;Read Line Status
+	      test al , 00100000b
+	      JZ   CHK
+	;$$
+	; CONSUME
+	      MOV  AH,0
+	      INT  16H
+	      CMP AH,3BH
+	      JNZ NXTT
+	      MOV VAL,'$'
+		NXTT:
+	; WRITE
+	      MOV  AH,2
+	      MOV  DL,VAL
+	      INT  21H
+	    ;   INC  CURSOR1
+		 advance_cursor1
+	;If empty put the VAL in Transmit data register
+	      mov  dx , 3F8H     	; Transmit data register
+	      mov  al,VAL
+	      out  dx , al
+	      CMP VAL,'$'
+	      JZ END_CHAT
+	;Receiving a VAL
+
+	;Check that Data is Ready
+	CHK:  
+	      mov  dx , 3FDH     	; Line Status Register
+	      in   al , dx
+	      test al , 1
+	      JZ   AGAIN         	;Not Ready (This line may need to change)
+	;If Ready read the VAL in Receive data register
+	      mov  dx , 03F8H
+	      in   al , dx
+	      mov  VAL , al
+	      CMP VAL,'$'
+	      JZ END_CHAT
+	;Set Cursor2
+	      MOV  DX,CURSOR2
+	      MOV  AH,2
+	      MOV  BH,0
+	      INT  10H
+	;Write it
+	      MOV  AH,2
+	      MOV  DL,VAL
+	      INT  21H
+		  advance_cursor2
+	    ;   INC  CURSOR2
+
+	      JMP  AGAIN
+END_CHAT:
+
+ENDM in_game_chat
