@@ -6,14 +6,14 @@
 
 ### How to run the program from vscode extension
 
-##### mount M Phase2-DragonBall
-##### M:
-##### ml main.asm;
-##### link main.obj;
-##### main.exe
+#### mount M Phase2-DragonBall
+#### M:
+#### ml main.asm;
+#### link main.obj;
+#### main.exe
 
 
-####### By:
+##### By:
 * Ammar Mohamed
 * Ahmed Ayman
 * Mohamed Akram
